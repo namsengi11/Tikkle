@@ -8,12 +8,19 @@ from typing import List, Set
 from datetime import datetime
 from starlette.middleware.base import BaseHTTPMiddleware
 
+class Factory(BaseModel):
+  id: int
+  name: str
+
+class Factories(BaseModel):
+  factories: List[Factory]
+
 class Incident(BaseModel):
   id: int
   title: str
   description: str
   date: datetime
-  factory_id: int
+  factory: Factory
 
 class newIncident(BaseModel):
   title: str
@@ -23,13 +30,6 @@ class newIncident(BaseModel):
 
 class Incidents(BaseModel):
   incidents: List[Incident]
-
-class Factory(BaseModel):
-  id: int
-  name: str
-
-class Factories(BaseModel):
-  factories: List[Factory]
 
 app = FastAPI()
 
@@ -74,18 +74,27 @@ def get_incidents():
 @app.post("/incidents", response_model=Incident)
 def add_incident(incident: newIncident):
   # Assign an id to the incident
-  new_incident = Incident(id=len(memory) + 1, **incident.model_dump())
+  factoryIdx = -1
+  for i, factory in enumerate(factories.factories):
+    if factory.id == incident.factory_id:
+      factoryIdx = i
+  if factoryIdx == -1:
+    raise HTTPException(status_code=404, detail="Factory not found")
+
+  new_incident = Incident(id=len(memory), **incident.model_dump(), factory=factories.factories[factoryIdx])
   memory.append(new_incident)
   return new_incident
 
 @app.get("/incidents/{incident_id}", response_model=Incident)
 def get_incident(incident_id: int):
-  return memory[incident_id]
+  try:
+    return memory[incident_id]
+  except IndexError:
+    raise HTTPException(status_code=404, detail="Incident not found")
 
 @app.get("/incidents/factory/{factory_id}", response_model=Incidents)
 def get_incidents_by_factory(factory_id: int):
-  print(memory)
-  return Incidents(incidents=[incident for incident in memory if incident.factory_id == factory_id])
+  return Incidents(incidents=[incident for incident in memory if incident.factory.id == factory_id])
 
 @app.get("/factories", response_model=Factories)
 def get_factories():
@@ -93,7 +102,10 @@ def get_factories():
 
 @app.get("/factories/{factory_id}", response_model=Factory)
 def get_factory(factory_id: int):
-  return factories.factories[factory_id]
+  try:
+    return factories.factories[factory_id]
+  except IndexError:
+    raise HTTPException(status_code=404, detail="Factory not found")
 
 if __name__ == "__main__":
   uvicorn.run(app, host="127.0.0.1", port=8000)

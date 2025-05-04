@@ -17,8 +17,14 @@ const Incident: React.FC<IncidentModel> = ({ incident }) => {
         </div>
         <div className="incidentContainerRow">
           <p className="incidentDescription">{incident.description}</p>
-          <button className="incidentButton">승인</button>
-          <button className="incidentButton">조회</button>
+          <button
+            onClick={() => {
+              window.location.href = `/incidents/${incident.id}`;
+            }}
+            className="incidentButton"
+          >
+            조회
+          </button>
         </div>
       </div>
     </div>
