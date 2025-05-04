@@ -83,6 +83,7 @@ def get_incident(incident_id: int):
 
 @app.get("/incidents/factory/{factory_id}", response_model=Incidents)
 def get_incidents_by_factory(factory_id: int):
+  print(memory)
   return Incidents(incidents=[incident for incident in memory if incident.factory_id == factory_id])
 
 @app.get("/factories", response_model=Factories)
