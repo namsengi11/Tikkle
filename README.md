@@ -1,1 +1,2 @@
-# README
+# Tikkle
+Industrial Accident Tracking Platform
