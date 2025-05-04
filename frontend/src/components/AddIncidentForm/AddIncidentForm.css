@@ -25,6 +25,14 @@
   border-radius: 4px;
   font-size: 14px;
   transition: border-color 0.2s;
+  background-color: white;
+  color: #333;
+}
+
+.formInput::-webkit-calendar-picker-indicator {
+  display: block;
+  cursor: pointer;
+  background-color: #4a90e2;
 }
 
 .formLabel {

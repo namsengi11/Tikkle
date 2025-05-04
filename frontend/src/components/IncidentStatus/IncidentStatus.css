@@ -8,27 +8,38 @@
 
 .overview {
   display: flex;
-  flex: 1;
+  /* flex: 1; */
   flex-direction: row;
+  height: 10%;
   justify-content: space-between;
   margin: 10px;
+  gap: 10px;
 }
 
 .overviewTitle {
   font-size: 24px;
   font-weight: 600;
   flex: 3;
+  color: #333;
 }
 
 .factorySelect {
   flex: 1;
   height: 30px;
-  margin-left: 10px;
+  background-color: #f8f8f8;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  padding: 5px;
+  color: #333;
 }
 
 .incidentsList {
-  display: flex;
+  /* display: flex;
   flex: 1;
-  flex-direction: column;
+  flex-direction: column; */
   margin: 10px;
+  border-radius: 5px;
+  background-color: #f8f8f8;
+  overflow-y: auto;
+  max-height: 500px;
 }

@@ -21,11 +21,23 @@ const Incident: React.FC<IncidentProps> = ({
 
   return (
     <div className="incidentContainer">
-      <div className="incidentHeader">
-        <h3 className="incidentTitle">{title}</h3>
-        <span className="incidentDate">{formattedDate}</span>
+      <div style={{width: "100%"}}>
+        <div className="incidentContainerRow">
+          <div className="incidentHeader">
+            <h3 className="incidentTitle">{title}</h3>
+            <span className="incidentDate">{formattedDate}</span>
+          </div>
+        </div>
+        <div className="incidentContainerRow">
+          <p className="incidentDescription">{description}</p>
+          <button className="incidentButton">
+            승인
+          </button>
+          <button className="incidentButton">
+            조회
+          </button>
+        </div>
       </div>
-      <p className="incidentDescription">{description}</p>
     </div>
   );
 };

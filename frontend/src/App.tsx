@@ -15,7 +15,7 @@ function App() {
           <header className="App-header">
             <h1>티끌</h1>
           </header>
-          <main style={{ flex: 1, display: "flex" }}>
+          <main className="main">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/incidents" element={<IncidentStatus />} />

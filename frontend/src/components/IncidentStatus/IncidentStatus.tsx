@@ -57,6 +57,7 @@ const IncidentStatus = () => {
           )
       );
       setIncidents(incidentObjects);
+      console.log(incidentObjects);
     };
     fetchIncidents();
   }, [factory]);

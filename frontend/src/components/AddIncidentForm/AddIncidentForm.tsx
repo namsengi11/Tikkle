@@ -7,20 +7,22 @@ import "./AddIncidentForm.css";
 const AddIncidentForm = ({
   onAdd,
 }: {
-  onAdd: (title: string, description: string, date: Date) => void;
+  onAdd: (title: string, description: string, date: Date, factory_id: number) => void;
 }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(new Date());
+  const [factory_id, setFactoryId] = useState<number>(-1);
   // List of selectable factories
   const [factories, setFactories] = useState<Factory[]>([]);
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (title && description && date) {
-      onAdd(title, description, date);
+      onAdd(title, description, date, factory_id);
       setTitle("");
       setDescription("");
       setDate(new Date());
+      setFactoryId(factories[0].id);
     }
   };
 
@@ -80,7 +82,7 @@ const AddIncidentForm = ({
         <label htmlFor="factory" className="formLabel">
           발생 공장
         </label>
-        <select id="factory" className="formInput">
+        <select id="factory" className="formInput" onChange={(e) => setFactoryId(parseInt(e.target.value))}>
           {factories.map((factory) => (
             <option key={factory.id} value={factory.id}>
               {factory.name}

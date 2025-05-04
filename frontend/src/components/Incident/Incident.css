@@ -2,12 +2,13 @@
   border: 1px solid #e0e0e0;
   border-radius: 4px;
   padding: 16px;
-  margin-bottom: 12px;
+  margin: 12px;
   background-color: #f8f8f8;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   display: flex;
   flex-direction: column;
-  width: 100%;
+  width: 97%;
+  align-items: center;
 }
 
 .incidentHeader {
@@ -17,6 +18,7 @@
   border-bottom: 1px solid #e0e0e0;
   padding-bottom: 8px;
   margin-bottom: 8px;
+  flex:1;
 }
 
 .incidentTitle {
@@ -38,4 +40,30 @@
   color: #444;
   font-size: 14px;
   line-height: 1.5;
+  flex: 1;
+  word-break: break-all;
+  white-space: normal;
+}
+
+.incidentContainerRow {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: end;
+  width: 100%;
+}
+
+.incidentButton {
+  padding: 10px 16px;
+  background-color: #4a90e2;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-top: 8px;
+  margin-left: 10px;
+  width: 80px;
+  height: 50px;
 }
