@@ -17,6 +17,9 @@ const IncidentStatus = () => {
   const [incidents, setIncidents] = useState<Incident[]>([]);
 
   const handleFactoryChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    // Clear incidents when factory changes
+    setIncidents([]);
+
     // Select from factories using selected value
     const selectedFactory = factories.find(
       (f) => f.id === parseInt(event.target.value)
@@ -57,7 +60,6 @@ const IncidentStatus = () => {
           )
       );
       setIncidents(incidentObjects);
-      console.log(incidentObjects);
     };
     fetchIncidents();
   }, [factory]);
@@ -69,20 +71,22 @@ const IncidentStatus = () => {
           오늘 {factory.name} 에서는 총 {incidents.length}건의 위험요소가
           등록되었습니다.
         </h1>
-        <select
-          value={factory.id}
-          onChange={handleFactoryChange}
-          className="factorySelect"
-        >
-          {factories.map((factory: Factory) => (
-            <option key={factory.id} value={factory.id}>
-              {factory.name}
-            </option>
-          ))}
-        </select>
+        <div style={{ width: "20%" }}>
+          <select
+            value={factory.id}
+            onChange={handleFactoryChange}
+            className="factorySelect"
+          >
+            {factories.map((factory: Factory) => (
+              <option key={factory.id} value={factory.id}>
+                {factory.name}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
       <div className="incidentsList">
-        <IncidentsList />
+        <IncidentsList incidents={incidents} />
       </div>
     </div>
   );

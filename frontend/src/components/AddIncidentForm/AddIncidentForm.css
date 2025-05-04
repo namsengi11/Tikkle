@@ -29,11 +29,11 @@
   color: #333;
 }
 
-.formInput::-webkit-calendar-picker-indicator {
+/* .formInput::-webkit-calendar-picker-indicator {
   display: block;
   cursor: pointer;
   background-color: #4a90e2;
-}
+} */
 
 .formLabel {
   font-weight: 500;

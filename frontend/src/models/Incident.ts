@@ -3,19 +3,21 @@ export class Incident {
   title: string;
   description: string;
   date: Date;
-  factory_id: number;
+  factoryId: number;
+  [key: string]: any;
 
   constructor(
     id: number,
     title: string,
     description: string,
     date: Date,
-    factory_id: number
+    factoryId: number,
+    ...otherProps: any
   ) {
     this.id = id;
     this.title = title;
     this.description = description;
     this.date = date;
-    this.factory_id = factory_id;
+    this.factoryId = factoryId;
   }
 }

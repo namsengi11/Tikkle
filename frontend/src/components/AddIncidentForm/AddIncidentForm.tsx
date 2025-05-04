@@ -7,7 +7,12 @@ import "./AddIncidentForm.css";
 const AddIncidentForm = ({
   onAdd,
 }: {
-  onAdd: (title: string, description: string, date: Date, factory_id: number) => void;
+  onAdd: (
+    title: string,
+    description: string,
+    date: Date,
+    factory_id: number
+  ) => void;
 }) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -33,6 +38,11 @@ const AddIncidentForm = ({
         (item: any) => new Factory(item.id, item.name)
       );
       setFactories(factoryObjects);
+      try {
+        setFactoryId(factoryObjects[0].id);
+      } catch (error) {
+        console.error("Empty factory list fetched", error);
+      }
     };
     fetchFactories();
   }, []);
@@ -73,6 +83,7 @@ const AddIncidentForm = ({
         <input
           id="date"
           type="date"
+          value={date.toISOString().split("T")[0]}
           onChange={(e) => setDate(new Date(e.target.value))}
           required
           className="formInput"
@@ -82,7 +93,11 @@ const AddIncidentForm = ({
         <label htmlFor="factory" className="formLabel">
           발생 공장
         </label>
-        <select id="factory" className="formInput" onChange={(e) => setFactoryId(parseInt(e.target.value))}>
+        <select
+          id="factory"
+          className="formInput"
+          onChange={(e) => setFactoryId(parseInt(e.target.value))}
+        >
           {factories.map((factory) => (
             <option key={factory.id} value={factory.id}>
               {factory.name}
