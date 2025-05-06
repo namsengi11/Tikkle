@@ -1,35 +1,16 @@
 import uvicorn
+import json
 
-from fastapi import FastAPI, Request, HTTPException, status
+from fastapi import FastAPI, Request, HTTPException, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
-from typing import List, Set
-from datetime import datetime
 from starlette.middleware.base import BaseHTTPMiddleware
+from db import get_db
+from sqlalchemy.orm import Session
+from typing import List
 
-class Factory(BaseModel):
-  id: int
-  name: str
-
-class Factories(BaseModel):
-  factories: List[Factory]
-
-class Incident(BaseModel):
-  id: int
-  title: str
-  description: str
-  date: datetime
-  factory: Factory
-
-class newIncident(BaseModel):
-  title: str
-  description: str
-  date: datetime
-  factory_id: int
-
-class Incidents(BaseModel):
-  incidents: List[Incident]
+from model import IncidentBase, FactoryBase, IncidentDBModel, IncidentResponse, FactoryResponse, IncidentResponses, FactoryResponses
+from db import Incident, Factory
 
 app = FastAPI()
 
@@ -64,48 +45,60 @@ app.add_middleware(
   allow_headers=["*"],
 )
 
-memory = []
-factories = Factories(factories=[Factory(id=0, name="공장1"), Factory(id=1, name="공장2")])
+def convertIncidentToResponse(incident: Incident, db: Session) -> IncidentResponse:
+  incident = IncidentDBModel.model_validate(incident)
+  incidentDict = incident.model_dump()
+  incidentDict["factory"] = db.query(Factory).filter(Factory.id == incident.factory_id).first()
+  return IncidentResponse.model_validate(incidentDict)
 
-@app.get("/incidents", response_model=Incidents)
-def get_incidents():
-  return Incidents(incidents=memory)
+@app.get("/incidents", response_model=IncidentResponses)
+def getIncidents(db: Session = Depends(get_db)):
+  incidents = db.query(Incident).all()
+  incidents = [convertIncidentToResponse(incident, db) for incident in incidents]
+  return IncidentResponses(incidents=incidents)
 
-@app.post("/incidents", response_model=Incident)
-def add_incident(incident: newIncident):
-  # Assign an id to the incident
-  factoryIdx = -1
-  for i, factory in enumerate(factories.factories):
-    if factory.id == incident.factory_id:
-      factoryIdx = i
-  if factoryIdx == -1:
+@app.post("/incidents", response_model=IncidentResponse)
+def addIncident(incident: IncidentBase, db: Session = Depends(get_db)):
+  factory = db.query(Factory).filter(Factory.id == incident.factory_id).first()
+  if factory is None:
     raise HTTPException(status_code=404, detail="Factory not found")
 
-  new_incident = Incident(id=len(memory), **incident.model_dump(), factory=factories.factories[factoryIdx])
-  memory.append(new_incident)
-  return new_incident
+  new_incident = Incident(**incident.model_dump())
+  db.add(new_incident)
+  db.commit()
+  db.refresh(new_incident)
+  return convertIncidentToResponse(new_incident, db)
 
-@app.get("/incidents/{incident_id}", response_model=Incident)
-def get_incident(incident_id: int):
-  try:
-    return memory[incident_id]
-  except IndexError:
+@app.get("/incidents/{incident_id}", response_model=IncidentResponse)
+def getIncident(incident_id: int, db: Session = Depends(get_db)):
+  incident = db.query(Incident).filter(Incident.id == incident_id).first()
+  if incident is None:
     raise HTTPException(status_code=404, detail="Incident not found")
+  return convertIncidentToResponse(incident, db)
 
-@app.get("/incidents/factory/{factory_id}", response_model=Incidents)
-def get_incidents_by_factory(factory_id: int):
-  return Incidents(incidents=[incident for incident in memory if incident.factory.id == factory_id])
-
-@app.get("/factories", response_model=Factories)
-def get_factories():
-  return factories
-
-@app.get("/factories/{factory_id}", response_model=Factory)
-def get_factory(factory_id: int):
-  try:
-    return factories.factories[factory_id]
-  except IndexError:
+@app.get("/incidents/factory/{factory_id}", response_model=IncidentResponses)
+def getIncidentsByFactory(factory_id: int, db: Session = Depends(get_db)):
+  # Check if the factory exists
+  factory = db.query(Factory).filter(Factory.id == factory_id).first()
+  if factory is None:
     raise HTTPException(status_code=404, detail="Factory not found")
+
+  incidents = db.query(Incident).filter(Incident.factory_id == factory_id).all()
+  incidents = [convertIncidentToResponse(incident, db) for incident in incidents]
+  return IncidentResponses(incidents=incidents)
+
+@app.get("/factories", response_model=FactoryResponses)
+def getFactories(db: Session = Depends(get_db)):
+  factories = db.query(Factory).all()
+  return FactoryResponses(factories=[FactoryResponse.model_validate(factory) for factory in factories])
+
+@app.get("/factories/{factory_id}", response_model=FactoryResponse)
+def getFactory(factory_id: int, db: Session = Depends(get_db)):
+  factory = db.query(Factory).filter(Factory.id == factory_id).first()
+  if factory is None:
+    raise HTTPException(status_code=404, detail="Factory not found")
+
+  return FactoryResponse.model_validate(factory)
 
 if __name__ == "__main__":
   uvicorn.run(app, host="127.0.0.1", port=8000)
