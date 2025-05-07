@@ -2,7 +2,6 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api";
 import { Incident } from "../../models/Incident";
-import { Factory } from "../../models/Factory";
 
 import "./IncidentDetail.css";
 import { AxiosError } from "axios";
@@ -26,24 +25,6 @@ const IncidentDetail = () => {
     };
     fetchIncident();
   }, [id]);
-
-  // const toString = (value: any): string => {
-  //   console.log(value);
-  //   console.log(typeof value);
-  //   if (typeof value === "string") {
-  //     return value;
-  //   } else if (typeof value === "number") {
-  //     return value.toString();
-  //   } else if (typeof value === "boolean") {
-  //     return value.toString();
-  //   } else if (value instanceof Date) {
-  //     return value.toLocaleDateString();
-  //   } else if (value instanceof Factory) {
-  //     console.log(value);
-  //     return value.name;
-  //   }
-  //   return value?.toString() || "N/A";
-  // };
 
   return (
     <div className="container">

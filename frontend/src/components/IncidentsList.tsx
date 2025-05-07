@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import Incident from "./Incident/Incident";
 import { Incident as IncidentModel } from "../models/Incident";
 
