@@ -63,11 +63,11 @@ def addIncident(incident: IncidentBase, db: Session = Depends(get_db)):
   if factory is None:
     raise HTTPException(status_code=404, detail="Factory not found")
 
-  new_incident = Incident(**incident.model_dump())
-  db.add(new_incident)
+  new_Incident = Incident(**incident.model_dump())
+  db.add(new_Incident)
   db.commit()
-  db.refresh(new_incident)
-  return convertIncidentToResponse(new_incident, db)
+  db.refresh(new_Incident)
+  return convertIncidentToResponse(new_Incident, db)
 
 @app.get("/incidents/{incident_id}", response_model=IncidentResponse)
 def getIncident(incident_id: int, db: Session = Depends(get_db)):
