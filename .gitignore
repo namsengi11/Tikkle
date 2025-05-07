@@ -5,7 +5,7 @@ scripts/flow/*/.flowconfig
 *~
 *.pyc
 backend/__pycache__
-backend/test.db
+*.db
 backend/.pytest_cache
 .grunt
 _SpecRunner.html
