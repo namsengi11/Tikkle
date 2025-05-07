@@ -3,11 +3,16 @@ import { format } from "date-fns";
 import "./Incident.css";
 import { Incident as IncidentModel } from "../../models/Incident";
 
-const Incident: React.FC<IncidentModel> = ({ incident }) => {
+interface IncidentProps {
+  id?: number; // Optional id parameter
+  incident: IncidentModel;
+}
+
+const Incident: React.FC<IncidentProps> = ({ incident, id }) => {
   const formattedDate = format(incident.date, "MM/dd/yyyy");
 
   return (
-    <div className="incidentContainer">
+    <div key={id} className="incidentContainer">
       <div style={{ width: "100%" }}>
         <div className="incidentContainerRow">
           <div className="incidentHeader">
