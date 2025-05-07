@@ -3,7 +3,7 @@ import json
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 
-DATABASE_URL = "sqlite:///database.db"
+DATABASE_URL = "sqlite:///./database.db"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
