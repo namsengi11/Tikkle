@@ -12,7 +12,7 @@ from typing import List
 from model import IncidentBase, FactoryBase, IncidentDBModel, IncidentResponse, FactoryResponse, IncidentResponses, FactoryResponses
 from db import Incident, Factory
 
-app = FastAPI()
+app = FastAPI(root_path="/api")
 
 # allowedIps: Set[str] = {
 #   "127.0.0.1",
@@ -33,8 +33,7 @@ app = FastAPI()
 # app.add_middleware(IpRestrictionMiddleware)
 
 origins = [
-  "http://127.0.0.1:5173",
-  "http://127.0.0.1:5174",
+  "http://127.0.0.1",
 ]
 
 app.add_middleware(
