@@ -2,6 +2,7 @@ import React from "react";
 import { format } from "date-fns";
 import "./Incident.css";
 import { Incident as IncidentModel } from "../../models/Incident";
+import { useNavigate } from "react-router-dom";
 
 interface IncidentProps {
   id?: number; // Optional id parameter
@@ -10,6 +11,7 @@ interface IncidentProps {
 
 const Incident: React.FC<IncidentProps> = ({ incident, id }) => {
   const formattedDate = format(incident.date, "MM/dd/yyyy");
+  const navigate = useNavigate();
 
   return (
     <div key={id} className="incidentContainer">
@@ -23,9 +25,7 @@ const Incident: React.FC<IncidentProps> = ({ incident, id }) => {
         <div className="incidentContainerRow">
           <p className="incidentDescription">{incident.description}</p>
           <button
-            onClick={() => {
-              window.location.href = `/incidents/${incident.id}`;
-            }}
+            onClick={() => navigate(`/incidents/${incident.id}`)}
             className="incidentButton"
           >
             조회
