@@ -16,7 +16,7 @@ logging.basicConfig(
   format='%(asctime)s - %(levelname)s - %(message)s',
   handlers=[
     # File handler only (removed console handler)
-    logging.FileHandler(logsDir / "serverlog.txt")
+    logging.FileHandler(logsDir / "server.log")
   ]
 )
 logger = logging.getLogger(__name__)
