@@ -5,35 +5,21 @@ from fastapi import FastAPI, Request, HTTPException, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
-from db import get_db
 from sqlalchemy.orm import Session
 from typing import List
 
+from db import get_db
 from model import IncidentBase, FactoryBase, IncidentDBModel, IncidentResponse, FactoryResponse, IncidentResponses, FactoryResponses
 from db import Incident, Factory
+from logging_middleware import LoggingMiddleware
 
 app = FastAPI(root_path="/api")
 
-# allowedIps: Set[str] = {
-#   "127.0.0.1",
-# }
-
-# # Custom middleware for IP restriction
-# class IpRestrictionMiddleware(BaseHTTPMiddleware):
-#   async def dispatch(self, request: Request, call_next):
-#     clientIp = request.client.host
-#     if clientIp not in allowedIps:
-#       return JSONResponse(
-#         status_code=status.HTTP_403_FORBIDDEN,
-#         content={"detail": "Access forbidden. Your IP is not allowed."}
-#       )
-#     return await call_next(request)
-
-# # Add the IP restriction middleware
-# app.add_middleware(IpRestrictionMiddleware)
-
+# Only allow requests from the local host (proxied by nginx)
 origins = [
   "http://127.0.0.1",
+  "http://127.0.0.1:5173", # dev frontend
+  "http://127.0.0.1:5174",
 ]
 
 app.add_middleware(
@@ -43,6 +29,9 @@ app.add_middleware(
   allow_methods=["*"],
   allow_headers=["*"],
 )
+
+# Add the middleware to the app
+app.add_middleware(LoggingMiddleware)
 
 def convertIncidentToResponse(incident: Incident, db: Session) -> IncidentResponse:
   incident = IncidentDBModel.model_validate(incident)
