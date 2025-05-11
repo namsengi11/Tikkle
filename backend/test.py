@@ -7,8 +7,8 @@ from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 
 from main import app, convertIncidentToResponse
-from db import get_db, Factory, Incident, Base
-from model import IncidentBase, FactoryBase, IncidentResponse, FactoryResponse
+from db import get_db, Factory, Incident, Base, ThreatType, WorkType
+from model import IncidentBase, IncidentResponse, FactoryResponse
 
 # Create test database
 @pytest.fixture(scope='session')
@@ -65,9 +65,27 @@ def createFactory(testDb) -> Factory:
   return factory
 
 @pytest.fixture()
-def createIncident(testDb, createFactory) -> Incident:
+def createThreatType(testDb) -> ThreatType:
+  threatType = ThreatType(name="Test Threat Type")
+  testDb.add(threatType)
+  testDb.commit()
+  testDb.refresh(threatType)
+  return threatType
+
+@pytest.fixture()
+def createWorkType(testDb) -> WorkType:
+  workType = WorkType(name="Test Work Type")
+  testDb.add(workType)
+  testDb.commit()
+  testDb.refresh(workType)
+  return workType
+
+@pytest.fixture()
+def createIncident(testDb, createFactory, createThreatType, createWorkType) -> Incident:
   incident = Incident(
-    title="Test Incident",
+    threatType_id=createThreatType.id,
+    threatLevel=1,
+    workType_id=createWorkType.id,
     description="Test Description",
     date=datetime.now(),
     factory_id=createFactory.id
@@ -77,12 +95,6 @@ def createIncident(testDb, createFactory) -> Incident:
   testDb.refresh(incident)
 
   return incident
-
-# Model tests
-def testFactoryBaseToModel():
-  factoryBase = FactoryBase(name="Test Factory")
-  factory = Factory(**factoryBase.model_dump())
-  assert factory.name == "Test Factory"
 
 def testFactoryModel(testDb, createFactory):
   # Test factory creation
@@ -97,13 +109,17 @@ def testFactoryModel(testDb, createFactory):
 def testIncidentBaseToModel():
   dateUsed = datetime.now()
   incidentBase = IncidentBase(
-    title="Test Incident",
+    threatType_id=1,
+    threatLevel=1,
+    workType_id=1,
     description="Test Description",
     date=dateUsed,
     factory_id=0
   )
   incident = Incident(**incidentBase.model_dump())
-  assert incident.title == "Test Incident"
+  assert incident.threatType_id == 1
+  assert incident.threatLevel == 1
+  assert incident.workType_id == 1
   assert incident.description == "Test Description"
   assert incident.factory_id == 0
   assert incident.date == dateUsed
@@ -111,14 +127,19 @@ def testIncidentBaseToModel():
 def testIncidentModel(testDb, createIncident, createFactory):
   # Test incident creation
   assert createIncident.id is not None
-  assert createIncident.title == "Test Incident"
+  assert createIncident.threatType_id == 1
+  assert createIncident.threatLevel == 1
+  assert createIncident.workType_id == 1
   assert createIncident.description == "Test Description"
   assert createIncident.factory_id == createFactory.id
 
   # Test incident retrieval
   retrievedIncident = testDb.query(Incident).filter(Incident.id == createIncident.id).first()
   assert retrievedIncident is not None
-  assert retrievedIncident.title == createIncident.title
+  assert retrievedIncident.threatType_id == createIncident.threatType_id
+  assert retrievedIncident.threatLevel == createIncident.threatLevel
+  assert retrievedIncident.workType_id == createIncident.workType_id
+  assert retrievedIncident.description == createIncident.description
   assert retrievedIncident.factory_id == createFactory.id
 
 # Pydantic model tests
@@ -127,14 +148,18 @@ def testFactoryResponseModel(createFactory):
   assert factoryResponse.id == createFactory.id
   assert factoryResponse.name == createFactory.name
 
-def testIncidentResponseModel(testDb, createFactory, createIncident):
+def testIncidentResponseModel(testDb, createFactory, createIncident, createThreatType, createWorkType):
   incidentResponse = convertIncidentToResponse(createIncident, testDb)
   assert incidentResponse.id == createIncident.id
-  assert incidentResponse.title == createIncident.title
+  assert incidentResponse.threatType.id == createIncident.threatType_id
+  assert incidentResponse.threatType.name == createThreatType.name
+  assert incidentResponse.threatLevel == createIncident.threatLevel
+  assert incidentResponse.workType.id == createIncident.workType_id
+  assert incidentResponse.workType.name == createWorkType.name
+  assert incidentResponse.description == createIncident.description
+  assert incidentResponse.date == createIncident.date
   assert incidentResponse.factory.id == createIncident.factory_id
-  modelDict = createFactory.__dict__.copy()
-  modelDict.pop("_sa_instance_state")
-  assert incidentResponse.factory.__dict__ == modelDict
+  assert isinstance(incidentResponse.check_responses, dict)
 
 # API endpoint tests
 def testGetFactories(testDb, createFactory):
@@ -169,8 +194,10 @@ def testGetIncident(testDb, createIncident):
   assert response.status_code == 200
   data = response.json()
   assert data["id"] == createIncident.id
-  assert data["title"] == createIncident.title
+  assert data["description"] == createIncident.description
   assert data["factory"]["id"] == createIncident.factory_id
+  assert "threatType" in data
+  assert "workType" in data
 
 def testGetIncidentNotFound(testDb):
   response = client.get("/incidents/9999")
@@ -182,15 +209,17 @@ def testGetIncidentsByFactory(testDb, createIncident, createFactory):
   data = response.json()
   assert "incidents" in data
   assert len(data["incidents"]) >= 1
-  assert all(incident["factory_id"] == createFactory.id for incident in data["incidents"])
+  assert all(incident["factory"]["id"] == createFactory.id for incident in data["incidents"])
 
 def testGetIncidentsByFactoryNotFound(testDb):
   response = client.get("/incidents/factory/9999")
   assert response.status_code == 404
 
-def testAddIncident(testDb, createFactory):
+def testAddIncident(testDb, createFactory, createThreatType, createWorkType):
   incidentData = {
-    "title": "New Test Incident",
+    "threatType_id": createThreatType.id,
+    "threatLevel": 1,
+    "workType_id": createWorkType.id,
     "description": "New Test Description",
     "date": datetime.now().isoformat(),
     "factory_id": createFactory.id
@@ -198,13 +227,16 @@ def testAddIncident(testDb, createFactory):
   response = client.post("/incidents", json=incidentData)
   assert response.status_code == 200
   data = response.json()
-  assert data["title"] == incidentData["title"]
   assert data["description"] == incidentData["description"]
   assert data["factory"]["id"] == incidentData["factory_id"]
+  assert data["threatType"]["id"] == incidentData["threatType_id"]
+  assert data["workType"]["id"] == incidentData["workType_id"]
 
-def testAddIncidentInvalidFactory(testDb):
+def testAddIncidentInvalidFactory(testDb, createThreatType, createWorkType):
   incidentData = {
-    "title": "New Test Incident",
+    "threatType_id": createThreatType.id,
+    "threatLevel": 1,
+    "workType_id": createWorkType.id,
     "description": "New Test Description",
     "date": datetime.now().isoformat(),
     "factory_id": 9999
