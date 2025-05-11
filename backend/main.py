@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from db import get_db
-from model import IncidentBase, FactoryBase, IncidentDBModel, IncidentResponse, FactoryResponse, IncidentResponses, FactoryResponses
-from db import Incident, Factory
+from model import IncidentBase, IncidentDBModel, IncidentResponse, FactoryResponse, IncidentResponses, FactoryResponses, ThreatTypeResponse, ThreatTypeResponses, WorkTypeResponse, WorkTypeResponses, CheckQuestionResponse, CheckQuestionResponses
+from db import Incident, Factory, ThreatType, WorkType, CheckQuestion, CheckResponse
 from logging_middleware import LoggingMiddleware
 
 app = FastAPI(root_path="/api")
@@ -36,7 +36,23 @@ app.add_middleware(LoggingMiddleware)
 def convertIncidentToResponse(incident: Incident, db: Session) -> IncidentResponse:
   incident = IncidentDBModel.model_validate(incident)
   incidentDict = incident.model_dump()
-  incidentDict["factory"] = db.query(Factory).filter(Factory.id == incident.factory_id).first()
+  # get factory object for response
+  incidentDict["factory"] = FactoryResponse.model_validate(db.query(Factory).filter(Factory.id == incident.factory_id).first())
+
+  # get check responses for response
+  checkResponses = db.query(CheckResponse).filter(CheckResponse.incident_id == incident.id).all()
+  checkResponsesDict = dict()
+  for checkResponse in checkResponses:
+    checkQuestion = db.query(CheckQuestion).filter(CheckQuestion.id == checkResponse.question_id).first()
+    checkResponsesDict[CheckQuestionResponse.model_validate(checkQuestion)] = checkResponse.response
+  incidentDict["check_responses"] = checkResponsesDict
+
+  # get threat type object for response
+  incidentDict["threatType"] = ThreatTypeResponse.model_validate(db.query(ThreatType).filter(ThreatType.id == incident.threatType_id).first())
+
+  # get work type object for response
+  incidentDict["workType"] = WorkTypeResponse.model_validate(db.query(WorkType).filter(WorkType.id == incident.workType_id).first())
+
   return IncidentResponse.model_validate(incidentDict)
 
 @app.get("/incidents", response_model=IncidentResponses)
@@ -87,6 +103,21 @@ def getFactory(factory_id: int, db: Session = Depends(get_db)):
     raise HTTPException(status_code=404, detail="Factory not found")
 
   return FactoryResponse.model_validate(factory)
+
+@app.get("/threatTypes", response_model=ThreatTypeResponses)
+def getThreatTypes(db: Session = Depends(get_db)):
+  threatTypes = db.query(ThreatType).all()
+  return ThreatTypeResponses(threatTypes=[ThreatTypeResponse.model_validate(threatType) for threatType in threatTypes])
+
+@app.get("/workTypes", response_model=WorkTypeResponses)
+def getWorkTypes(db: Session = Depends(get_db)):
+  workTypes = db.query(WorkType).all()
+  return WorkTypeResponses(workTypes=[WorkTypeResponse.model_validate(workType) for workType in workTypes])
+
+@app.get("/checks", response_model=CheckQuestionResponses)
+def getCheckQuestions(db: Session = Depends(get_db)):
+  checkQuestions = db.query(CheckQuestion).all()
+  return CheckQuestionResponses(checks=[CheckQuestionResponse.model_validate(checkQuestion) for checkQuestion in checkQuestions])
 
 if __name__ == "__main__":
   uvicorn.run(app, host="127.0.0.1", port=8000)

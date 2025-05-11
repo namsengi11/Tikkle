@@ -46,6 +46,7 @@ const AddIncidentForm = ({
     for (const [key, value] of checks.entries()) {
       if (value !== null) {
         checksResponse.set(key, value);
+        checks.set(key, value);
       }
     }
     if (checksResponse.size !== checks.size) {
@@ -65,10 +66,10 @@ const AddIncidentForm = ({
     setThreatTypeId(-1);
     setThreatLevel(-1);
     setWorkTypeId(-1);
-    setChecks(new Map<string, boolean | null>());
     setDescription("");
     setDate(new Date());
     setFactoryId(-1);
+    setChecks(checks);
   };
 
   useEffect(() => {
@@ -118,7 +119,7 @@ const AddIncidentForm = ({
           const response = await api.get("/checks");
           const checkObjects: Map<string, boolean | null> = new Map();
           for (const item of response.data.checks) {
-            checkObjects.set(item.name, null);
+            checkObjects.set(item.question, null);
           }
           setChecks(checkObjects);
         } catch (error) {
