@@ -2,15 +2,85 @@ from pydantic import BaseModel
 from datetime import datetime
 from typing import Optional, List
 
+class WorkforceSizeRangeResponse(BaseModel):
+  id: int
+  range: str
+
+  class Config:
+    from_attributes = True
+
+class WorkforceSizeRangeResponses(BaseModel):
+  workforceSizeRanges: List[WorkforceSizeRangeResponse]
+
 class FactoryResponse(BaseModel):
   id: int
   name: str
+  workforceSizeRange: WorkforceSizeRangeResponse
 
   class Config:
     from_attributes = True
 
 class FactoryResponses(BaseModel):
   factories: List[FactoryResponse]
+
+class AgeRangeResponse(BaseModel):
+  id: int
+  range: str
+
+  class Config:
+    from_attributes = True
+
+class AgeRangeResponses(BaseModel):
+  ageRanges: List[AgeRangeResponse]
+
+class WorkExperienceRangeResponse(BaseModel):
+  id: int
+  range: str
+
+  class Config:
+    from_attributes = True
+
+class WorkExperienceRangeResponses(BaseModel):
+  workExperienceRanges: List[WorkExperienceRangeResponse]
+
+class WorkerInput(BaseModel):
+  name: str
+  age: int
+  sex: str
+  workExperience: int
+
+class WorkerResponse(BaseModel):
+  id: int
+  name: str
+  age: AgeRangeResponse
+  sex: str
+  workExperience: WorkExperienceRangeResponse
+
+  class Config:
+    from_attributes = True
+
+class WorkerResponses(BaseModel):
+  workers: List[WorkerResponse]
+
+class IndustryTypeLargeResponse(BaseModel):
+  id: int
+  name: str
+
+  class Config:
+    from_attributes = True
+
+class IndustryTypeLargeResponses(BaseModel):
+  industryTypeLarge: List[IndustryTypeLargeResponse]
+
+class IndustryTypeMediumResponse(BaseModel):
+  id: int
+  name: str
+
+  class Config:
+    from_attributes = True
+
+class IndustryTypeMediumResponses(BaseModel):
+  industryTypeMedium: List[IndustryTypeMediumResponse]
 
 class ThreatTypeResponse(BaseModel):
   id: int
@@ -43,6 +113,9 @@ class CheckQuestionResponses(BaseModel):
   checks: List[CheckQuestionResponse]
 
 class IncidentBase(BaseModel):
+  worker_id: int
+  industry_large_id: int
+  industry_medium_id: int
   threatType_id: int
   threatLevel: int
   workType_id: int
@@ -53,14 +126,11 @@ class IncidentBase(BaseModel):
 class IncidentInput(IncidentBase):
   check_responses: dict[int, bool]
 
-class IncidentDBModel(IncidentBase):
-  id: int
-
-  class Config:
-    from_attributes = True
-
 class IncidentResponse(BaseModel):
   id: int
+  worker: WorkerResponse
+  industry_large: IndustryTypeLargeResponse
+  industry_medium: IndustryTypeMediumResponse
   threatType: ThreatTypeResponse
   threatLevel: int
   workType: WorkTypeResponse
