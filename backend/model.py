@@ -45,16 +45,16 @@ class WorkExperienceRangeResponses(BaseModel):
 
 class WorkerInput(BaseModel):
   name: str
-  age: int
+  ageRange_id: int
   sex: str
-  workExperience: int
+  workExperienceRange_id: int
 
 class WorkerResponse(BaseModel):
   id: int
   name: str
-  age: AgeRangeResponse
+  ageRange: AgeRangeResponse
   sex: str
-  workExperience: WorkExperienceRangeResponse
+  workExperienceRange: WorkExperienceRangeResponse
 
   class Config:
     from_attributes = True
@@ -114,8 +114,8 @@ class CheckQuestionResponses(BaseModel):
 
 class IncidentBase(BaseModel):
   worker_id: int
-  industry_large_id: int
-  industry_medium_id: int
+  industryTypeLarge_id: int
+  industryTypeMedium_id: int
   threatType_id: int
   threatLevel: int
   workType_id: int
@@ -129,8 +129,8 @@ class IncidentInput(IncidentBase):
 class IncidentResponse(BaseModel):
   id: int
   worker: WorkerResponse
-  industry_large: IndustryTypeLargeResponse
-  industry_medium: IndustryTypeMediumResponse
+  industryTypeLarge: IndustryTypeLargeResponse
+  industryTypeMedium: IndustryTypeMediumResponse
   threatType: ThreatTypeResponse
   threatLevel: int
   workType: WorkTypeResponse

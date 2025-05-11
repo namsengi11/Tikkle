@@ -40,6 +40,7 @@ app.add_middleware(
 )
 
 varNameToModel = {
+  "incident": Incident,
   "factory": Factory,
   "threatType": ThreatType,
   "workType": WorkType,
@@ -49,9 +50,11 @@ varNameToModel = {
   "industryTypeLarge": IndustryTypeLarge,
   "industryTypeMedium": IndustryTypeMedium,
   "workforceSizeRange": WorkforceSizeRange,
+  "worker": Worker,
 }
 
 varNameToResponseModel = {
+  "incident": IncidentResponse,
   "factory": FactoryResponse,
   "threatType": ThreatTypeResponse,
   "workType": WorkTypeResponse,
@@ -61,6 +64,7 @@ varNameToResponseModel = {
   "industryTypeLarge": IndustryTypeLargeResponse,
   "industryTypeMedium": IndustryTypeMediumResponse,
   "workforceSizeRange": WorkforceSizeRangeResponse,
+  "worker": WorkerResponse,
 }
 
 def convertDBModelintoResponseModel(dbModel, db: Session, additionalAttributes: dict = {}) -> BaseModel:
@@ -76,8 +80,7 @@ def convertDBModelintoResponseModel(dbModel, db: Session, additionalAttributes: 
         logger.error(f"{datetime.now()}: {key.replace('_id', '')} of id {value} not found")
         raise HTTPException(status_code=404, detail=f"{key.replace('_id', '')} not found")
       else:
-        responseModel = varNameToResponseModel[key.replace("_id", "")]
-        modelDict[key.replace("_id", "")] = responseModel.model_validate(object)
+        modelDict[key.replace("_id", "")] = convertDBModelintoResponseModel(object, db)
         modelDict.pop(key)
   modelDict.update(additionalAttributes)
   responseModel = varNameToResponseModel[dbModel.typeToString()]
@@ -147,7 +150,7 @@ def getFactory(factory_id: int, db: Session = Depends(get_db)):
   if factory is None:
     raise HTTPException(status_code=404, detail="Factory not found")
 
-  return FactoryResponse.model_validate(factory)
+  return convertDBModelintoResponseModel(factory, db)
 
 @app.get("/threatTypes", response_model=ThreatTypeResponses)
 def getThreatTypes(db: Session = Depends(get_db)):

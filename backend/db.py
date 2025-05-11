@@ -36,9 +36,9 @@ class Worker(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     name = Column(String)
-    age = Column(Integer, ForeignKey("age_range.id"))
+    ageRange_id = Column(Integer, ForeignKey("age_range.id"))
     sex = Column(String)
-    workExperience = Column(Integer, ForeignKey("work_experience_range.id"))
+    workExperienceRange_id = Column(Integer, ForeignKey("work_experience_range.id"))
 
     __table_args__ = (
         CheckConstraint("sex in ('남', '여')", name="check_sex_values"),
@@ -52,8 +52,8 @@ class Incident(Base):
 
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     worker_id = Column(Integer, ForeignKey("worker.id"))
-    industry_large_id = Column(Integer, ForeignKey("industry_type_large.id"))
-    industry_medium_id = Column(Integer, ForeignKey("industry_type_medium.id"))
+    industryTypeLarge_id = Column(Integer, ForeignKey("industry_type_large.id"))
+    industryTypeMedium_id = Column(Integer, ForeignKey("industry_type_medium.id"))
     threatType_id = Column(Integer, ForeignKey("threat_type.id"))
     threatLevel = Column(Integer)
     workType_id = Column(Integer, ForeignKey("work_type.id"))
