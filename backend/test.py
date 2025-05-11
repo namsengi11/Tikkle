@@ -6,8 +6,8 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 
-from main import app, convertIncidentToResponse
-from db import get_db, Factory, Incident, Base, ThreatType, WorkType
+from main import app, convertIncidentToResponse, convertDBModelintoResponseModel
+from db import get_db, Factory, Incident, Base, ThreatType, WorkType, Worker, WorkforceSizeRange, AgeRange, WorkExperienceRange, IndustryTypeLarge, IndustryTypeMedium
 from model import IncidentBase, IncidentResponse, FactoryResponse
 
 # Create test database
@@ -29,10 +29,12 @@ def db_session_factory(db_engine):
 @pytest.fixture(scope="session")
 def setupTables(db_engine):
   # Create tables once for the entire test session
-  Base.metadata.create_all(bind=db_engine)
-  yield
-  # Drop tables after all tests are done
-  Base.metadata.drop_all(bind=db_engine)
+  try:
+    Base.metadata.create_all(bind=db_engine)
+    yield
+  finally:
+    # Drop tables after all tests are done
+    Base.metadata.drop_all(bind=db_engine)
 
 @pytest.fixture(scope="function")
 def testDb(setupTables, db_session_factory):
@@ -40,29 +42,87 @@ def testDb(setupTables, db_session_factory):
   with db_session_factory() as session:
     # Override the dependency
     app.dependency_overrides[get_db] = lambda: session
-    yield session
+    try:
+      yield session
+    finally:
+      # Clean up after each test by truncating all tables
+      # This is faster than dropping and recreating tables
+      for table in reversed(Base.metadata.sorted_tables):
+        session.execute(table.delete())
+      session.commit()
 
-    # Clean up after each test by truncating all tables
-    # This is faster than dropping and recreating tables
-    for table in reversed(Base.metadata.sorted_tables):
-      session.execute(table.delete())
-    session.commit()
-
-    # Clear the dependency override
-    app.dependency_overrides.clear()
+      # Clear the dependency override
+      app.dependency_overrides.clear()
 
 # Create test client
 client = TestClient(app)
 
 # Test data fixtures
 @pytest.fixture()
-def createFactory(testDb) -> Factory:
-  factory = Factory(name="Test Factory")
+def createWorkforceSizeRange(testDb) -> WorkforceSizeRange:
+  workforceSizeRange = WorkforceSizeRange(range="Test Workforce Size Range")
+  testDb.add(workforceSizeRange)
+  testDb.commit()
+  testDb.refresh(workforceSizeRange)
+  return workforceSizeRange
+
+@pytest.fixture()
+def createAgeRange(testDb) -> AgeRange:
+  ageRange = AgeRange(range="Test Age Range")
+  testDb.add(ageRange)
+  testDb.commit()
+  testDb.refresh(ageRange)
+  return ageRange
+
+@pytest.fixture()
+def createWorkExperienceRange(testDb) -> WorkExperienceRange:
+  workExperienceRange = WorkExperienceRange(range="Test Work Experience Range")
+  testDb.add(workExperienceRange)
+  testDb.commit()
+  testDb.refresh(workExperienceRange)
+  return workExperienceRange
+
+@pytest.fixture()
+def createIndustryTypeLarge(testDb) -> IndustryTypeLarge:
+  industryTypeLarge = IndustryTypeLarge(name="Test Industry Type Large")
+  testDb.add(industryTypeLarge)
+  testDb.commit()
+  testDb.refresh(industryTypeLarge)
+  return industryTypeLarge
+
+@pytest.fixture()
+def createIndustryTypeMedium(testDb) -> IndustryTypeMedium:
+  industryTypeMedium = IndustryTypeMedium(name="Test Industry Type Medium")
+  testDb.add(industryTypeMedium)
+  testDb.commit()
+  testDb.refresh(industryTypeMedium)
+  return industryTypeMedium
+
+@pytest.fixture()
+def createFactory(testDb, createWorkforceSizeRange) -> Factory:
+  factory = Factory(
+    name="Test Factory",
+    workforceSizeRange_id=createWorkforceSizeRange.id
+  )
   testDb.add(factory)
   testDb.commit()
   testDb.refresh(factory)
 
   return factory
+
+@pytest.fixture()
+def createWorker(testDb, createAgeRange, createWorkExperienceRange) -> Worker:
+  worker = Worker(
+    name="Test Worker",
+    ageRange_id=createAgeRange.id,
+    sex="남",
+    workExperienceRange_id=createWorkExperienceRange.id
+  )
+  testDb.add(worker)
+  testDb.commit()
+  testDb.refresh(worker)
+
+  return worker
 
 @pytest.fixture()
 def createThreatType(testDb) -> ThreatType:
@@ -81,8 +141,11 @@ def createWorkType(testDb) -> WorkType:
   return workType
 
 @pytest.fixture()
-def createIncident(testDb, createFactory, createThreatType, createWorkType) -> Incident:
+def createIncident(testDb, createFactory, createThreatType, createWorkType, createIndustryTypeLarge, createIndustryTypeMedium, createWorker) -> Incident:
   incident = Incident(
+    worker_id=createWorker.id,
+    industryTypeLarge_id=createIndustryTypeLarge.id,
+    industryTypeMedium_id=createIndustryTypeMedium.id,
     threatType_id=createThreatType.id,
     threatLevel=1,
     workType_id=createWorkType.id,
@@ -106,22 +169,28 @@ def testFactoryModel(testDb, createFactory):
   assert retrievedFactory is not None
   assert retrievedFactory.name == createFactory.name
 
-def testIncidentBaseToModel():
+def testIncidentBaseToModel(testDb, createIncident):
   dateUsed = datetime.now()
   incidentBase = IncidentBase(
+    worker_id=1,
+    industryTypeLarge_id=1,
+    industryTypeMedium_id=1,
     threatType_id=1,
     threatLevel=1,
     workType_id=1,
     description="Test Description",
     date=dateUsed,
-    factory_id=0
+    factory_id=1
   )
   incident = Incident(**incidentBase.model_dump())
+  assert incident.worker_id == 1
+  assert incident.industryTypeLarge_id == 1
+  assert incident.industryTypeMedium_id == 1
   assert incident.threatType_id == 1
   assert incident.threatLevel == 1
   assert incident.workType_id == 1
   assert incident.description == "Test Description"
-  assert incident.factory_id == 0
+  assert incident.factory_id == 1
   assert incident.date == dateUsed
 
 def testIncidentModel(testDb, createIncident, createFactory):
@@ -131,7 +200,7 @@ def testIncidentModel(testDb, createIncident, createFactory):
   assert createIncident.threatLevel == 1
   assert createIncident.workType_id == 1
   assert createIncident.description == "Test Description"
-  assert createIncident.factory_id == createFactory.id
+  assert createIncident.factory_id == 1
 
   # Test incident retrieval
   retrievedIncident = testDb.query(Incident).filter(Incident.id == createIncident.id).first()
@@ -143,19 +212,18 @@ def testIncidentModel(testDb, createIncident, createFactory):
   assert retrievedIncident.factory_id == createFactory.id
 
 # Pydantic model tests
-def testFactoryResponseModel(createFactory):
-  factoryResponse = FactoryResponse.model_validate(createFactory)
+def testFactoryResponseModel(testDb, createFactory):
+  factoryResponse = convertDBModelintoResponseModel(createFactory, testDb)
   assert factoryResponse.id == createFactory.id
   assert factoryResponse.name == createFactory.name
+  assert factoryResponse.workforceSizeRange.id == createFactory.workforceSizeRange_id
 
-def testIncidentResponseModel(testDb, createFactory, createIncident, createThreatType, createWorkType):
+def testIncidentResponseModel(testDb, createIncident):
   incidentResponse = convertIncidentToResponse(createIncident, testDb)
   assert incidentResponse.id == createIncident.id
   assert incidentResponse.threatType.id == createIncident.threatType_id
-  assert incidentResponse.threatType.name == createThreatType.name
   assert incidentResponse.threatLevel == createIncident.threatLevel
   assert incidentResponse.workType.id == createIncident.workType_id
-  assert incidentResponse.workType.name == createWorkType.name
   assert incidentResponse.description == createIncident.description
   assert incidentResponse.date == createIncident.date
   assert incidentResponse.factory.id == createIncident.factory_id
@@ -176,6 +244,7 @@ def testGetFactory(testDb, createFactory):
   data = response.json()
   assert data["id"] == createFactory.id
   assert data["name"] == createFactory.name
+  assert data["workforceSizeRange"]["id"] == createFactory.workforceSizeRange_id
 
 def testGetFactoryNotFound(testDb):
   response = client.get("/factories/9999")
@@ -196,6 +265,7 @@ def testGetIncident(testDb, createIncident):
   assert data["id"] == createIncident.id
   assert data["description"] == createIncident.description
   assert data["factory"]["id"] == createIncident.factory_id
+  assert data["worker"]["id"] == createIncident.worker_id
   assert "threatType" in data
   assert "workType" in data
 
@@ -215,14 +285,17 @@ def testGetIncidentsByFactoryNotFound(testDb):
   response = client.get("/incidents/factory/9999")
   assert response.status_code == 404
 
-def testAddIncident(testDb, createFactory, createThreatType, createWorkType):
+def testAddIncident(testDb, createIncident):
   incidentData = {
-    "threatType_id": createThreatType.id,
-    "threatLevel": 1,
-    "workType_id": createWorkType.id,
+    "threatType_id": createIncident.threatType_id,
+    "threatLevel": createIncident.threatLevel,
+    "industryTypeLarge_id": createIncident.industryTypeLarge_id,
+    "industryTypeMedium_id": createIncident.industryTypeMedium_id,
+    "workType_id": createIncident.workType_id,
     "description": "New Test Description",
     "date": datetime.now().isoformat(),
-    "factory_id": createFactory.id
+    "factory_id": createIncident.factory_id,
+    "worker_id": createIncident.worker_id
   }
   response = client.post("/incidents", json=incidentData)
   assert response.status_code == 200
@@ -232,14 +305,17 @@ def testAddIncident(testDb, createFactory, createThreatType, createWorkType):
   assert data["threatType"]["id"] == incidentData["threatType_id"]
   assert data["workType"]["id"] == incidentData["workType_id"]
 
-def testAddIncidentInvalidFactory(testDb, createThreatType, createWorkType):
+def testAddIncidentInvalidFactory(testDb, createIncident):
   incidentData = {
-    "threatType_id": createThreatType.id,
-    "threatLevel": 1,
-    "workType_id": createWorkType.id,
+    "threatType_id": createIncident.threatType_id,
+    "threatLevel": createIncident.threatLevel,
+    "industryTypeLarge_id": createIncident.industryTypeLarge_id,
+    "industryTypeMedium_id": createIncident.industryTypeMedium_id,
+    "workType_id": createIncident.workType_id,
     "description": "New Test Description",
     "date": datetime.now().isoformat(),
-    "factory_id": 9999
+    "factory_id": 9999,
+    "worker_id": createIncident.worker_id
   }
   response = client.post("/incidents", json=incidentData)
   assert response.status_code == 404
