@@ -44,7 +44,7 @@
 
 .formInput:focus {
   outline: none;
-  border-color: #4a90e2;
+  border-color: #fa9e00;
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.2);
 }
 
@@ -55,7 +55,7 @@
 
 .submitButton {
   padding: 10px 16px;
-  background-color: #4a90e2;
+  background-color: #fa9e00;
   color: white;
   border: none;
   border-radius: 4px;
@@ -67,9 +67,9 @@
 }
 
 .submitButton:hover {
-  background-color: #3a7bc8;
+  background-color: #fa9e00;
 }
 
 .submitButton:active {
-  background-color: #2a6db8;
+  background-color: #fa9e00;
 }

@@ -13,7 +13,7 @@ function App() {
         <Navigation />
         <div className="App-content">
           <header className="App-header">
-            <h1>티끌</h1>
+            <img src="/logo.png" alt="Tikkle Logo" style={{ height: "50px", marginRight: "10px" }} />
           </header>
           <main className="main">
             <Routes>
