@@ -3,7 +3,7 @@ import "./DropdownSelect.css";
 
 interface DropdownOption {
   id: number;
-  label: string;
+  name: string;
 }
 
 interface DropdownSelectProps {
@@ -40,7 +40,7 @@ const DropdownSelect = ({
         </option>
         {options.map((option) => (
           <option key={option.id} value={option.id}>
-            {option.label}
+            {option.name}
           </option>
         ))}
       </select>

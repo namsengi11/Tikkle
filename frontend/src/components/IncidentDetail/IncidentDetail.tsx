@@ -56,7 +56,7 @@ const IncidentDetail = () => {
             </div>
           </div>
           <div className="OneQuarterContainer">
-            <div className="DetailsContainer">
+            <div className="detailContainer">
               <h2 className="subtitle">상세 정보</h2>
               <p>{incident.description}</p>
             </div>
