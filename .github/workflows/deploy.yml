@@ -44,4 +44,4 @@ jobs:
       - name: Deploy frontend using SCP
         run: scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r ./frontend/dist/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/tikkle
       - name: Restart backend
-        run: ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ~/Tikkle/backend ; source venv/bin/activate ; python3 -m pip install -r requirements.txt ; kill -9 $(ps -ef | grep uvicorn | awk '{print $2}') 2>/dev/null || true ; nohup python3 -m uvicorn main:app --host 127.0.0.1 --port 8000 > nohup.out 2>&1 &"
+        run: ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd ~/Tikkle/backend ; source venv/bin/activate ; python3 -m pip install -r requirements.txt ; sudo systemctl restart fastapi"
