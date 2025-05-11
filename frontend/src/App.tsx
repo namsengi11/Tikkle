@@ -12,9 +12,14 @@ function App() {
       <div className="App">
         <Navigation />
         <div className="App-content">
-          <header className="App-header">
-            <h1>티끌</h1>
-          </header>
+          <div className="App-header-container">
+            <div className="App-header-logo">
+              <img src="/favicon/favicon.ico" alt="logo" />
+            </div>
+            <header className="App-header">
+              <h1>티끌</h1>
+            </header>
+          </div>
           <main className="main">
             <Routes>
               <Route path="/" element={<Dashboard />} />

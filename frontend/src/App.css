@@ -5,6 +5,20 @@
   padding: 0;
 }
 
+:root {
+  /* Primary colors */
+  --primary-color: #24a1f9;
+
+  /* Secondary colors */
+  --secondary-color: #0650e5;
+
+  /* Neutral colors */
+  --text-color: #333333;
+  --background-color: #f8f8f8;
+  --border-color: #e0e0e0;
+  --white: #ffffff;
+}
+
 html,
 body,
 #root {
@@ -27,24 +41,30 @@ body,
   flex: 1;
 }
 
+.App-header-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--primary-color);
+  /* border-bottom: 1px solid var(--secondary-color); */
+}
+
 .App-header {
-  background-color: #f8f8f8;
   padding: 16px 24px;
-  border-bottom: 1px solid #e0e0e0;
 }
 
 .App-header h1 {
   margin: 0;
   font-size: 24px;
-  color: #333;
-  margin-bottom: 12px;
+  color: var(--white);
 }
 
 main {
-  background-color: #fff;
+  background-color: var(--white);
   width: 100%;
   margin: 0;
-  flex:1;
+  flex: 1;
 }
 
 /* Responsive adjustments */
@@ -56,46 +76,4 @@ main {
   .App-header h1 {
     font-size: 20px;
   }
-}
-
-#root {
-  margin: 0;
-  padding: 0;
-  text-align: center;
-}
-
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
-}
-
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
-}
-
-.card {
-  padding: 2em;
-}
-
-.read-the-docs {
-  color: #888;
 }
