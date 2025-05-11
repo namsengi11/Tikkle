@@ -65,10 +65,14 @@ const IncidentStatus = () => {
           (item: any) =>
             new Incident(
               item.id,
-              item.title,
+              item.threatType,
+              item.threatLevel,
+              item.workType,
+              item.checks,
               item.description,
               item.date,
-              item.factory_id
+              item.factory,
+              item.additionalData
             )
         );
         setIncidents(incidentObjects);
