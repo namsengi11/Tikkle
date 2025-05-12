@@ -1,20 +1,13 @@
 {
-  "checkQuestions": [
+  "check_question": [
     {
-      "id": 0,
-      "question": "장비 및 보호구 착용"
+      "question": "보호구 착용"
     },
     {
-      "id": 1,
       "question": "유사 사고 경험"
     },
     {
-      "id": 2,
-      "question": "안전 감독자 있음"
-    },
-    {
-      "id": 3,
-      "question": "안전 교육 및 훈련"
+      "question": "안전 감독자"
     }
   ]
 }

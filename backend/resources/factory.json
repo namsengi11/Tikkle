@@ -1,16 +1,16 @@
 {
-  "factories": [
+  "factory": [
     {
-      "id": 0,
-      "name": "평택 공장"
+      "name": "평택 공장",
+      "workforceSizeRange_id": 1
     },
     {
-      "id": 1,
-      "name": "청주 공장"
+      "name": "청주 공장",
+      "workforceSizeRange_id": 1
     },
     {
-      "id": 2,
-      "name": "대전 공장"
+      "name": "대전 공장",
+      "workforceSizeRange_id": 3
     }
   ]
 }

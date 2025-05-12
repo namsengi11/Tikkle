@@ -1,0 +1,20 @@
+# register uvicorn as a service on systemd
+
+[Unit]
+Description=Tikkle
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+Group=ubuntu
+
+WorkingDirectory=/home/ubuntu/Tikkle/backend
+ExecStart=/home/ubuntu/Tikkle/backend/venv/bin/python3 -m uvicorn main:app --host 127.0.0.1 --port=8000
+
+ExecReload=/bin/kill -HUP ${MAINPID}
+RestartSec=1
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
