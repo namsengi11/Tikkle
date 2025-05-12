@@ -5,6 +5,7 @@ import IncidentStatus from "./components/IncidentStatus/IncidentStatus";
 import IncidentDetail from "./components/IncidentDetail/IncidentDetail";
 import Navigation from "./components/Navigation/Navigation";
 import Dashboard from "./components/Dashboard/Dashboard";
+import ProfilePage from "./components/Profile/Profile"; 
 
 function App() {
   return (
@@ -12,20 +13,16 @@ function App() {
       <div className="App">
         <Navigation />
         <div className="App-content">
-          <div className="App-header-container">
-            <div className="App-header-logo">
-              <img src="/favicon/favicon.ico" alt="logo" />
-            </div>
-            <header className="App-header">
-              <h1>티끌</h1>
-            </header>
-          </div>
+          <header className="App-header">
+            <img src="/logo.png" alt="Tikkle Logo" style={{ height: "50px", marginRight: "10px" }} />
+          </header>
           <main className="main">
             <Routes>
               <Route path="/" element={<Dashboard />} />
               <Route path="/incidents" element={<IncidentStatus />} />
               <Route path="/incidents/report" element={<IncidentReport />} />
               <Route path="/incidents/:id" element={<IncidentDetail />} />
+              <Route path="/profile" element={<ProfilePage />} />
               {/* <Route path="*" element={<NotFound />} /> */}
             </Routes>
           </main>
