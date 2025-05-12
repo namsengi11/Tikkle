@@ -5,6 +5,7 @@ import IncidentStatus from "./components/IncidentStatus/IncidentStatus";
 import IncidentDetail from "./components/IncidentDetail/IncidentDetail";
 import Navigation from "./components/Navigation/Navigation";
 import Dashboard from "./components/Dashboard/Dashboard";
+import ProfilePage from "./components/Profile/Profile"; 
 
 function App() {
   return (
@@ -21,6 +22,7 @@ function App() {
               <Route path="/incidents" element={<IncidentStatus />} />
               <Route path="/incidents/report" element={<IncidentReport />} />
               <Route path="/incidents/:id" element={<IncidentDetail />} />
+              <Route path="/profile" element={<ProfilePage />} />
               {/* <Route path="*" element={<NotFound />} /> */}
             </Routes>
           </main>

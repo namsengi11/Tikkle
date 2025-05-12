@@ -1,0 +1,66 @@
+.profile-container {
+  display: flex;
+  justify-content: center;
+  padding: 40px;
+  gap: 20px;
+}
+
+.profile-box,
+.mileage-box {
+  border: 1px solid #ccc;
+  border-radius: 20px;
+  padding: 30px;
+  height: 700px;
+  width: 50%;
+  text-align: center;
+  box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.profile-image {
+  width: 300px;
+  height: 300px;
+  border-radius: 16px;
+  margin-bottom: 20px;
+}
+
+select {
+  width: 80%;
+  padding: 8px;
+  margin: 10px 0;
+  font-size: 14px;
+}
+
+.circle {
+  width: 400px;
+  height: 400px;
+  margin: 0 auto;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+circle.bg {
+  fill: none;
+  stroke: #eee;
+  stroke-width: 10;
+}
+
+circle.progress {
+  fill: none;
+  stroke: yellow;
+  stroke-width: 10;
+  stroke-linecap: round;
+  stroke-dasharray: 282.6;
+  stroke-dashoffset: 282.6;
+  transition: stroke-dashoffset 0.5s ease-in-out;
+}
+
+.mileage-text {
+  fill: black;
+  font-size: 22px;
+  font-weight: bold;
+  transform: rotate(90deg);
+}

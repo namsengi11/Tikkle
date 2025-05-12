@@ -15,7 +15,6 @@ const Navigation = () => {
         <li>
           <NavLink
             to="/incidents"
-            // Custom logic: active for /incidents and /incidents/id/* but not for /incidents/report
             className={({ isActive }) => {
               if (
                 isActive &&
@@ -34,6 +33,11 @@ const Navigation = () => {
         <li>
           <NavLink to="/incidents/report" end>
             미세산재 신고
+          </NavLink>
+        </li>
+        <li>
+          <NavLink to="/profile" end>
+            내 정보
           </NavLink>
         </li>
       </ul>
