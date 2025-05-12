@@ -3,34 +3,55 @@
   flex: 1;
   flex-direction: column;
   justify-content: space-between;
-  margin: 10px;
   height: 100%;
+  color: black;
+  margin: 1.5%;
+  padding: 0;
 }
 
-.rowContainerFifth {
+.firstRowContainer {
   display: flex;
-  flex: 1;
+  flex: 0 0 24%;
   width: 100%;
   flex-direction: row;
   justify-content: space-between;
+  min-height: 0;
+  overflow: hidden;
 }
 
-.rowContainerTwoFifth {
+.followingRowContainer {
   display: flex;
-  flex: 2;
+  flex: 0 0 38%;
   width: 100%;
   flex-direction: row;
   justify-content: space-between;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.dashboardCell {
+  display: flex;
+  flex: 0 0 50%;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  height: 100%;
+  overflow: hidden;
+}
+
+.followingRowContainer > .dashboardCell {
+  padding-top: 0;
 }
 
 .card {
+  display: flex;
   flex: 1;
+  flex-direction: row;
   color: #333;
   border: 1px solid #e0e0e0;
-  background-color: #f8f8f8;
-  border-radius: 5px;
+  background-color: var(--dark-background-color);
+  border-radius: 15px;
   padding: 10px;
-  margin: 10px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   justify-content: center;
   align-items: center;
@@ -38,6 +59,75 @@
 
 .cardTitle {
   display: flex;
+  justify-content: right;
+  align-items: center;
+  padding-right: 10px;
+  font-size: 1.1rem;
+}
+
+.FactoryRiskBox {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding-left: 5%;
+  padding-right: 5%;
+}
+
+.FactoryRiskScore {
+  display: flex;
+  flex: 1.5;
+  border-bottom: 2px solid black;
   justify-content: center;
   align-items: center;
+  font-size: 3rem;
+  font-weight: bolder;
+}
+
+.FactoryName {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.AIEvaluation {
+  color: #333;
+  font-size: 1.2rem;
+  text-align: justify;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+
+.AIEvaluationText {
+  background-color: yellow;
+}
+
+.barChartContainer {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.pieChartContainer {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
+}
+
+.lineChartContainer {
+  display: flex;
+  flex: 1;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  width: 100%;
 }

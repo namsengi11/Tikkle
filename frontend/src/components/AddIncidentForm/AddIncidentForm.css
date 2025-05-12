@@ -17,6 +17,14 @@
   flex-direction: column;
   gap: 6px;
   width: 70%;
+  padding-bottom: 30px;
+  border-bottom: 1px solid #ddd;
+}
+
+.checkListGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .formInput {
@@ -27,6 +35,7 @@
   transition: border-color 0.2s;
   background-color: white;
   color: #333;
+  margin-bottom: 10px;
 }
 
 .formInput::-webkit-calendar-picker-indicator {

@@ -11,6 +11,7 @@ interface DropdownSelectProps {
   onChange: (selectedId: number) => void;
   placeholder?: string;
   required?: boolean;
+  id?: string;
 }
 
 const DropdownSelect = ({
@@ -18,6 +19,7 @@ const DropdownSelect = ({
   onChange,
   placeholder = "Select an option",
   required = false,
+  id = "",
 }: DropdownSelectProps) => {
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setValue(parseInt(e.target.value));
@@ -29,6 +31,7 @@ const DropdownSelect = ({
   return (
     <div className="selectContainer">
       <select
+        id={id}
         className="formInput"
         value={value === -1 ? "" : value}
         onChange={handleChange}
