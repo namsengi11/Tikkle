@@ -11,16 +11,34 @@ const IncidentReport = () => {
   }>({ show: false, message: "", isSuccess: false });
 
   const addIncident = async (
+    name: string,
+    ageRange_id: number,
+    sex: string,
+    workExperienceRange_id: number,
+
+    industryTypeLarge_id: number,
+    industryTypeMedium_id: number,
+    workType_id: number,
     threatType_id: number,
     threatLevel: number,
-    workType_id: number,
-    checks: Map<string, boolean>,
-    description: string,
     date: Date,
-    factory_id: number
+    factory_id: number,
+    checks: Map<string, boolean>,
+    description: string
   ) => {
     try {
+      const newWorker = {
+        name: name,
+        ageRange_id: ageRange_id,
+        sex: sex,
+        workExperienceRange_id: workExperienceRange_id,
+      };
+      const newWorkerResponse = await api.post("/workers", newWorker);
+      const newWorkerId = newWorkerResponse.data.id;
       const newIncident = {
+        worker_id: newWorkerId,
+        industryTypeLarge_id: industryTypeLarge_id,
+        industryTypeMedium_id: industryTypeMedium_id,
         threatType_id: threatType_id,
         threatLevel: threatLevel,
         workType_id: workType_id,

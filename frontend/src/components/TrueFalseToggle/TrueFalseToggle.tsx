@@ -4,11 +4,13 @@ import "./TrueFalseToggle.css";
 interface TrueFalseToggleProps {
   initialValue?: boolean | null;
   onChange: (value: boolean | null) => void;
+  id?: string;
 }
 
 const TrueFalseToggle: React.FC<TrueFalseToggleProps> = ({
   initialValue = null,
   onChange,
+  id = "",
 }) => {
   const [selectedValue, setSelectedValue] = useState<boolean | null>(
     initialValue
@@ -21,15 +23,23 @@ const TrueFalseToggle: React.FC<TrueFalseToggleProps> = ({
     onChange(newValue);
   };
 
+  // Add appropriate class based on selection state
+  let containerClass = "trueFalseToggle";
+  if (selectedValue === true) {
+    containerClass += " trueSelected";
+  } else if (selectedValue === false) {
+    containerClass += " falseSelected";
+  }
+
   return (
-    <div className="trueFalseToggle">
+    <div className={containerClass}>
       <button
         className={`toggleButton ${selectedValue === true ? "selected" : ""}`}
         onClick={() => handleSelection(true)}
         aria-label="True"
         type="button"
       >
-        <span className="checkmark">✓</span>
+        <span className="checkmark">O</span>
       </button>
       <button
         className={`toggleButton ${selectedValue === false ? "selected" : ""}`}
@@ -37,7 +47,7 @@ const TrueFalseToggle: React.FC<TrueFalseToggleProps> = ({
         aria-label="False"
         type="button"
       >
-        <span className="xmark">✗</span>
+        <span className="xmark">X</span>
       </button>
     </div>
   );
