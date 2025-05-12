@@ -50,7 +50,7 @@ circle.bg {
 
 circle.progress {
   fill: none;
-  stroke: yellow;
+  stroke: rgb(255, 166, 0);
   stroke-width: 10;
   stroke-linecap: round;
   stroke-dasharray: 282.6;

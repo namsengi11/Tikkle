@@ -11,14 +11,20 @@ const IncidentReport = () => {
   }>({ show: false, message: "", isSuccess: false });
 
   const addIncident = async (
-    title: string,
+    threatType_id: number,
+    threatLevel: number,
+    workType_id: number,
+    checks: Map<string, boolean>,
     description: string,
     date: Date,
     factory_id: number
   ) => {
     try {
       const newIncident = {
-        title: title,
+        threatType_id: threatType_id,
+        threatLevel: threatLevel,
+        workType_id: workType_id,
+        checks: Array.from(checks.entries()),
         description: description,
         date: date.toISOString(),
         factory_id: factory_id,

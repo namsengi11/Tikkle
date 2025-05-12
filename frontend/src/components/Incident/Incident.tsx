@@ -18,7 +18,7 @@ const Incident: React.FC<IncidentProps> = ({ incident, id }) => {
       <div style={{ width: "100%" }}>
         <div className="incidentContainerRow">
           <div className="incidentHeader">
-            <h3 className="incidentTitle">{incident.title}</h3>
+            <h3 className="incidentTitle">{incident.threatType?.name}</h3>
             <span className="incidentDate">{formattedDate}</span>
           </div>
         </div>

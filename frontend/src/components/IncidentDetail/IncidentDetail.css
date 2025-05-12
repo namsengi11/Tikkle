@@ -76,7 +76,8 @@
   justify-content: space-around;
   width: 100%;
   height: 80%;
-  background-color: #fff;
+  background-color: var(--white);
+  color: var(--text-color);
   border-radius: 10px;
   padding-left: 10px;
 }
@@ -96,4 +97,8 @@
   align-items: center;
   font-size: 50px;
   color: #333;
+}
+
+.detailContainer {
+  color: var(--text-color);
 }

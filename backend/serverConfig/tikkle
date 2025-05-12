@@ -1,0 +1,18 @@
+# routing for requesting requests for frontend and backend
+
+server {
+  listen 80;
+  listen [::]:80;
+
+  location /api/ {
+    proxy_pass http://localhost:8000;
+  }
+
+  location / {
+    if (!-e $request_filename) {
+      rewrite ^(.*)$ /index.html break;
+    }
+    root /var/www/tikkle;
+    index index.html;
+  }
+}

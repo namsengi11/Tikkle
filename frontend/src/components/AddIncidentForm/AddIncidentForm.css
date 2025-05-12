@@ -29,11 +29,11 @@
   color: #333;
 }
 
-/* .formInput::-webkit-calendar-picker-indicator {
+.formInput::-webkit-calendar-picker-indicator {
   display: block;
   cursor: pointer;
-  background-color: #4a90e2;
-} */
+  background-color: var(--secondary-color);
+}
 
 .formLabel {
   font-weight: 500;
@@ -56,6 +56,7 @@
 .submitButton {
   padding: 10px 16px;
   background-color: #fa9e00;
+  background-color: var(--secondary-color);
   color: white;
   border: none;
   border-radius: 4px;
