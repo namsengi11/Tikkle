@@ -1,11 +1,11 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "./Profile.css";
 
 const ProfilePage = () => {
   const [location, setLocation] = useState("");
   const [position, setPosition] = useState("");
   const [team, setTeam] = useState("");
-  const [mileage, setMileage] = useState(500);
+  const [mileage] = useState(500);
 
   const percent = Math.min(mileage / 1000, 1) * 100;
 
