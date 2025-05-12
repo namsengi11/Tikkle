@@ -3,18 +3,6 @@ import BarChart from "../Charts/BarChart";
 import PieChart from "../Charts/PieChart";
 import LineChart from "../Charts/LineChart";
 
-// Add type interface for the label props
-interface CustomizedLabelProps {
-  cx: number;
-  cy: number;
-  midAngle: number;
-  innerRadius: number;
-  outerRadius: number;
-  percent: number;
-  index: number;
-  name: string;
-}
-
 const Dashboard = () => {
   // Mock data for pie chart
   const pieChartData = [
@@ -52,35 +40,6 @@ const Dashboard = () => {
     "#FAA700",
     "#FFBE1A",
   ];
-
-  // Update the label function with proper typing
-  const renderCustomizedLabel = ({
-    cx,
-    cy,
-    midAngle,
-    innerRadius,
-    outerRadius,
-    percent,
-    index,
-    name,
-  }: CustomizedLabelProps) => {
-    const RADIAN = Math.PI / 180;
-    const radius = outerRadius * 1.35;
-    const x = cx + radius * Math.cos(-midAngle * RADIAN);
-    const y = cy + radius * Math.sin(-midAngle * RADIAN);
-
-    return (
-      <text
-        x={x}
-        y={y}
-        fill="#000000"
-        textAnchor={x > cx ? "start" : "end"}
-        dominantBaseline="central"
-      >
-        {`${name} ${(percent * 100).toFixed(0)}%`}
-      </text>
-    );
-  };
 
   return (
     <div className="container">

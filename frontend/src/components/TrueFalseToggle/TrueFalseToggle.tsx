@@ -32,7 +32,7 @@ const TrueFalseToggle: React.FC<TrueFalseToggleProps> = ({
   }
 
   return (
-    <div className={containerClass}>
+    <div className={containerClass} id={id}>
       <button
         className={`toggleButton ${selectedValue === true ? "selected" : ""}`}
         onClick={() => handleSelection(true)}

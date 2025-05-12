@@ -35,10 +35,8 @@ const PieChart: React.FC<PieChartProps> = ({ data, colors }) => {
     cx,
     cy,
     midAngle,
-    innerRadius,
     outerRadius,
     percent,
-    index,
     name,
   }: CustomizedLabelProps) => {
     const RADIAN = Math.PI / 180;
@@ -76,7 +74,7 @@ const PieChart: React.FC<PieChartProps> = ({ data, colors }) => {
           >
             {data.map((entry, index) => (
               <Cell
-                key={`cell-${index}`}
+                key={`cell-${entry.name}`}
                 fill={colors[index % colors.length]}
               />
             ))}
