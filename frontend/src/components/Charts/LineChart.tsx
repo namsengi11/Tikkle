@@ -32,41 +32,6 @@ const LineChart: React.FC<LineChartProps> = ({
   xAxisDataKey = "date",
   legendPosition = "bottom",
 }) => {
-  // Configure legend based on position
-  const getLegendProps = () => {
-    switch (legendPosition) {
-      case "right":
-        return {
-          layout: "vertical",
-          align: "right",
-          verticalAlign: "middle",
-          wrapperStyle: { paddingLeft: 20 },
-        };
-      case "left":
-        return {
-          layout: "vertical",
-          align: "left",
-          verticalAlign: "middle",
-          wrapperStyle: { paddingRight: 20 },
-        };
-      case "top":
-        return {
-          layout: "horizontal",
-          align: "center",
-          verticalAlign: "top",
-          wrapperStyle: { paddingBottom: 10 },
-        };
-      case "bottom":
-      default:
-        return {
-          layout: "horizontal",
-          align: "center",
-          verticalAlign: "bottom",
-          wrapperStyle: { paddingTop: 10 },
-        };
-    }
-  };
-
   // Calculate appropriate margins based on legend position
   const getChartMargins = () => {
     const baseMargin = { top: 5, right: 30, left: 20, bottom: 5 };
@@ -102,7 +67,12 @@ const LineChart: React.FC<LineChartProps> = ({
             tickMargin={5}
           />
           <Tooltip />
-          <Legend {...getLegendProps()} />
+          <Legend
+            layout="vertical"
+            align="right"
+            verticalAlign="middle"
+            wrapperStyle={{ paddingLeft: 20 }}
+          />
           {lines.map((line, index) => (
             <Line
               key={`line-${index}`}
