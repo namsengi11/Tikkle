@@ -1,25 +1,39 @@
 import json
+from datetime import datetime
 
-from sqlalchemy import create_engine, Column, Integer, String, DateTime, ForeignKey, inspect, CheckConstraint, text, Boolean
+from sqlalchemy import (
+    create_engine,
+    Column,
+    Integer,
+    String,
+    DateTime,
+    ForeignKey,
+    inspect,
+    CheckConstraint,
+    text,
+    Boolean,
+    Float,
+    Text,
+)
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from sqlalchemy import event
 
 DATABASE_URL = "sqlite:///../database.db"
 
-engine = create_engine(
-  DATABASE_URL,
-  connect_args={"check_same_thread": False}
-)
+engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+
 
 # Enable foreign key constraints for SQLite
 @event.listens_for(engine, "connect")
 def setForeignKeyConstraint(dbapi_connection, connection_record):
-  cursor = dbapi_connection.cursor()
-  cursor.execute("PRAGMA foreign_keys=ON")
-  cursor.close()
+    cursor = dbapi_connection.cursor()
+    cursor.execute("PRAGMA foreign_keys=ON")
+    cursor.close()
+
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
+
 
 class Factory(Base):
     __tablename__ = "factory"
@@ -31,6 +45,7 @@ class Factory(Base):
     def typeToString(self):
         return "factory"
 
+
 class Worker(Base):
     __tablename__ = "worker"
 
@@ -40,12 +55,11 @@ class Worker(Base):
     sex = Column(String)
     workExperienceRange_id = Column(Integer, ForeignKey("work_experience_range.id"))
 
-    __table_args__ = (
-        CheckConstraint("sex in ('남', '여')", name="check_sex_values"),
-    )
+    __table_args__ = (CheckConstraint("sex in ('남', '여')", name="check_sex_values"),)
 
     def typeToString(self):
         return "worker"
+
 
 class Incident(Base):
     __tablename__ = "incident"
@@ -64,6 +78,7 @@ class Incident(Base):
     def typeToString(self):
         return "incident"
 
+
 class ThreatType(Base):
     __tablename__ = "threat_type"
 
@@ -72,6 +87,7 @@ class ThreatType(Base):
 
     def typeToString(self):
         return "threatType"
+
 
 class WorkType(Base):
     __tablename__ = "work_type"
@@ -82,6 +98,7 @@ class WorkType(Base):
     def typeToString(self):
         return "workType"
 
+
 class CheckQuestion(Base):
     __tablename__ = "check_question"
 
@@ -91,14 +108,20 @@ class CheckQuestion(Base):
     def typeToString(self):
         return "checkQuestion"
 
+
 class CheckResponse(Base):
     __tablename__ = "check_response"
-    question_id = Column(Integer, ForeignKey("check_question.id"), primary_key=True, index=True)
-    incident_id = Column(Integer, ForeignKey("incident.id"), primary_key=True, index=True)
+    question_id = Column(
+        Integer, ForeignKey("check_question.id"), primary_key=True, index=True
+    )
+    incident_id = Column(
+        Integer, ForeignKey("incident.id"), primary_key=True, index=True
+    )
     response = Column(Boolean)
 
     def typeToString(self):
         return "checkResponse"
+
 
 class IndustryTypeLarge(Base):
     __tablename__ = "industry_type_large"
@@ -109,6 +132,7 @@ class IndustryTypeLarge(Base):
     def typeToString(self):
         return "industryTypeLarge"
 
+
 class IndustryTypeMedium(Base):
     __tablename__ = "industry_type_medium"
 
@@ -117,6 +141,7 @@ class IndustryTypeMedium(Base):
 
     def typeToString(self):
         return "industryTypeMedium"
+
 
 class WorkforceSizeRange(Base):
     __tablename__ = "workforce_size_range"
@@ -127,6 +152,7 @@ class WorkforceSizeRange(Base):
     def typeToString(self):
         return "workforceSizeRange"
 
+
 class AgeRange(Base):
     __tablename__ = "age_range"
 
@@ -135,6 +161,7 @@ class AgeRange(Base):
 
     def typeToString(self):
         return "ageRange"
+
 
 class WorkExperienceRange(Base):
     __tablename__ = "work_experience_range"
@@ -145,7 +172,48 @@ class WorkExperienceRange(Base):
     def typeToString(self):
         return "workExperienceRange"
 
+
+# RiskAssessment
+class RiskAssessment(Base):
+    __tablename__ = "risk_assessment"
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
+    # 입력된 사고 정보
+    date = Column(DateTime, nullable=False)
+    name = Column(String, nullable=False)
+    factory = Column(String, nullable=False)
+    image = Column(String, nullable=True)
+    description = Column(String, nullable=True)
+    # rule-based + ML 결과
+    risk_score = Column(Integer, nullable=False)
+    risk_level = Column(String, nullable=False)
+    predicted_probability = Column(Float, nullable=False)
+    # 미세 산재 예측 결과
+    micro_most_likely_time = Column(String, nullable=True)
+    micro_probabilities = Column(Text, nullable=True)
+
+    def to_dict(self):
+        return {
+            "basic_information": {
+                "date": self.date.isoformat(),
+                "name": self.name,
+                "factory": self.factory,
+                "image": self.image,
+                "description": self.description,
+            },
+            "accident_possibility": {
+                "risk_score": self.risk_score,
+                "risk_level": self.risk_level,
+                "predicted_probability": self.predicted_probability,
+            },
+            "micro_accident_severity": {
+                "probabilities": json.loads(self.micro_probabilities or "{}"),
+                "most_likely_time": self.micro_most_likely_time,
+            },
+        }
+
+
 Base.metadata.create_all(bind=engine)
+
 
 def get_db():
     db = SessionLocal()
@@ -154,67 +222,104 @@ def get_db():
     finally:
         db.close()
 
+
+# Risk assessment save db 로직
+def save_risk_assessment(db: Session, result: dict):
+    bi = result["basic_information"]
+    ap = result["accident_possibility"]
+    ms = result.get("micro_accident_severity", {})
+    record = RiskAssessment(
+        date=(
+            datetime.fromisoformat(bi["date"])
+            if isinstance(bi["date"], str)
+            else bi["date"]
+        ),
+        name=bi["name"],
+        factory=bi["factory"],
+        image=bi.get("image"),
+        description=bi.get("description"),
+        risk_score=ap["risk_score"],
+        risk_level=ap["risk_level"],
+        predicted_probability=ap["predicted_probability"],
+        micro_most_likely_time=ms.get("most_likely_time"),
+        micro_probabilities=json.dumps(ms.get("probabilities", {}), ensure_ascii=False),
+    )
+    db.add(record)
+    db.commit()
+    db.refresh(record)
+    return record
+
+
 def ensureSchemaMatches():
-  """
-  Ensures that the database schema matches the SQLAlchemy models.
-  Adds missing columns with NULL default values for existing entries.
-  """
-  inspector = inspect(engine)
+    """
+    Ensures that the database schema matches the SQLAlchemy models.
+    Adds missing columns with NULL default values for existing entries.
+    """
+    inspector = inspect(engine)
 
-  # Get all model classes defined in this module
-  modelClasses = [
-    cls for cls in Base.__subclasses__()
-    if cls.__module__ == __name__
-  ]
+    # Get all model classes defined in this module
+    modelClasses = [cls for cls in Base.__subclasses__() if cls.__module__ == __name__]
 
-  for modelClass in modelClasses:
-    tableName = modelClass.__tablename__
-    print(f"Checking schema for table: {tableName}")
+    for modelClass in modelClasses:
+        tableName = modelClass.__tablename__
+        print(f"Checking schema for table: {tableName}")
 
-    # Get existing columns in the database
-    existingColumns = {col['name'] for col in inspector.get_columns(tableName)}
+        # Get existing columns in the database
+        existingColumns = {col["name"] for col in inspector.get_columns(tableName)}
 
-    # Get columns defined in the model
-    modelColumns = {column.key: column for column in modelClass.__table__.columns}
+        # Get columns defined in the model
+        modelColumns = {column.key: column for column in modelClass.__table__.columns}
 
-    # Find missing columns
-    missingColumns = set(modelColumns.keys()) - existingColumns
+        # Find missing columns
+        missingColumns = set(modelColumns.keys()) - existingColumns
 
-    if missingColumns:
-      print(f"Missing columns in {tableName}: {missingColumns}")
+        if missingColumns:
+            print(f"Missing columns in {tableName}: {missingColumns}")
 
-      # Add missing columns with NULL default
-      with engine.connect() as connection:
-        for colName in missingColumns:
-          column = modelColumns[colName]
-          colType = column.type.compile(engine.dialect)
+            # Add missing columns with NULL default
+            with engine.connect() as connection:
+                for colName in missingColumns:
+                    column = modelColumns[colName]
+                    colType = column.type.compile(engine.dialect)
 
-          # Create ALTER TABLE statement
-          alterStatement = f"ALTER TABLE {tableName} ADD COLUMN {colName} {colType}"
+                    # Create ALTER TABLE statement
+                    alterStatement = (
+                        f"ALTER TABLE {tableName} ADD COLUMN {colName} {colType}"
+                    )
 
-          if hasattr(column, 'foreign_keys') and column.foreign_keys:
-            fk = list(column.foreign_keys)[0]
-            alterStatement += f" REFERENCES {fk.column.table.name}({fk.column.name})"
+                    if hasattr(column, "foreign_keys") and column.foreign_keys:
+                        fk = list(column.foreign_keys)[0]
+                        alterStatement += (
+                            f" REFERENCES {fk.column.table.name}({fk.column.name})"
+                        )
 
-          try:
-            # Use text() to convert string to executable SQL expression
-            connection.execute(text(alterStatement))
-            connection.commit()
-            print(f"Added column {colName} to {tableName}")
-          except Exception as e:
-            print(f"Error adding column {colName} to {tableName}: {e}")
-    else:
-      print(f"Table {tableName} schema is up to date")
+                    try:
+                        # Use text() to convert string to executable SQL expression
+                        connection.execute(text(alterStatement))
+                        connection.commit()
+                        print(f"Added column {colName} to {tableName}")
+                    except Exception as e:
+                        print(f"Error adding column {colName} to {tableName}: {e}")
+        else:
+            print(f"Table {tableName} schema is up to date")
+
 
 # Call the function to ensure schema matches
 ensureSchemaMatches()
 
+
 def populateWithLocalData(localFileName: str, tableName: str, model, candidateKey: str):
-    data = json.load(open("resources/" + localFileName, "r", encoding="utf-8"))[tableName]
+    data = json.load(open("resources/" + localFileName, "r", encoding="utf-8"))[
+        tableName
+    ]
     with Session(engine) as session:
         for item in data:
             # Check if item already exists
-            itemExists = session.query(model).filter(getattr(model, candidateKey) == item[candidateKey]).first()
+            itemExists = (
+                session.query(model)
+                .filter(getattr(model, candidateKey) == item[candidateKey])
+                .first()
+            )
             if not itemExists:
                 # Item doesn't exist, add it
                 newItem = model(**item)
@@ -225,16 +330,23 @@ def populateWithLocalData(localFileName: str, tableName: str, model, candidateKe
                 print(f"{tableName} {item[candidateKey]} already exists, skipping")
         session.commit()
 
+
 # Repopulate constants with local data
 # Warning: This will delete all existing 'constant' data in the database
-populateWithLocalData("workforceSizeRange.json", "workforce_size_range", WorkforceSizeRange, "range")
+populateWithLocalData(
+    "workforceSizeRange.json", "workforce_size_range", WorkforceSizeRange, "range"
+)
 populateWithLocalData("factory.json", "factory", Factory, "name")
 populateWithLocalData("threatType.json", "threat_type", ThreatType, "name")
 populateWithLocalData("workType.json", "work_type", WorkType, "name")
 populateWithLocalData("checkQuestion.json", "check_question", CheckQuestion, "question")
 populateWithLocalData("ageRange.json", "age_range", AgeRange, "range")
-populateWithLocalData("workExperienceRange.json", "work_experience_range", WorkExperienceRange, "range")
-populateWithLocalData("industryTypeLarge.json", "industry_type_large", IndustryTypeLarge, "name")
-populateWithLocalData("industryTypeMedium.json", "industry_type_medium", IndustryTypeMedium, "name")
-
-
+populateWithLocalData(
+    "workExperienceRange.json", "work_experience_range", WorkExperienceRange, "range"
+)
+populateWithLocalData(
+    "industryTypeLarge.json", "industry_type_large", IndustryTypeLarge, "name"
+)
+populateWithLocalData(
+    "industryTypeMedium.json", "industry_type_medium", IndustryTypeMedium, "name"
+)
