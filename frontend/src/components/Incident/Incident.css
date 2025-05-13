@@ -1,14 +1,22 @@
 .incidentContainer {
   border: 1px solid #e0e0e0;
-  border-radius: 4px;
+  border-radius: 8px;
   padding: 16px;
-  margin: 12px;
-  background-color: #f8f8f8;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-  display: flex;
-  flex-direction: column;
+  margin-top: 8px;
+  margin-bottom: 8px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s, box-shadow 0.2s;
   width: 97%;
-  align-items: center;
+}
+
+.incidentContainer:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.incidentContent {
+  width: 100%;
 }
 
 .incidentHeader {
@@ -16,9 +24,16 @@
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid #e0e0e0;
-  padding-bottom: 8px;
-  margin-bottom: 8px;
-  flex: 1;
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  width: 100%;
+}
+
+.incidentHeaderInfo {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: wrap;
 }
 
 .incidentTitle {
@@ -28,14 +43,44 @@
   font-weight: 600;
 }
 
+.incidentFactoryName {
+  margin-left: 10px;
+  border-left: 2px solid var(--border-color, #ddd);
+  padding-left: 10px;
+  margin-right: 10px;
+  border-right: 2px solid var(--border-color, #ddd);
+  padding-right: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #555;
+}
+
 .incidentDate {
   color: #666;
   font-size: 14px;
   font-weight: 400;
+  background-color: #f5f5f5;
+  padding: 4px 8px;
+  border-radius: 4px;
+}
+
+.incidentDescriptionContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  flex: 1;
+}
+
+.incidentRiskLevel {
+  font-size: 16px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .incidentDescription {
-  margin: 0;
+  margin: 0 0 8px 0;
   text-align: left;
   color: #444;
   font-size: 14px;
@@ -45,25 +90,40 @@
   white-space: normal;
 }
 
+.incidentWorker {
+  margin: 0;
+  font-size: 14px;
+  color: #666;
+  font-style: italic;
+}
+
 .incidentContainerRow {
   display: flex;
   flex-direction: row;
   justify-content: space-between;
-  align-items: end;
+  align-items: flex-end;
   width: 100%;
 }
 
 .incidentButton {
   padding: 10px 16px;
-  background-color: var(--secondary-color);
+  background-color: var(--secondary-color, #2196f3);
   color: white;
   border: none;
   border-radius: 4px;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.2s;
-  margin-top: 8px;
-  margin-left: 10px;
-  width: 80px;
-  height: 50px;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-left: 16px;
+  min-width: 80px;
+  height: 45px;
+}
+
+.incidentButton:hover {
+  background-color: var(--secondary-color-dark, #1976d2);
+  transform: scale(1.05);
+}
+
+.incidentButton:active {
+  transform: scale(0.98);
 }

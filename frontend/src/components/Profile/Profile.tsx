@@ -12,12 +12,8 @@ const ProfilePage = () => {
   return (
     <div className="profile-container">
       <div className="profile-box">
-        <h2>프로필</h2>
-        <img
-          src="/worker.png"
-          alt="프로필"
-          className="profile-image"
-        />
+        <h2 style={{ color: "black", paddingBottom: "10px" }}>프로필</h2>
+        <img src="/worker.png" alt="프로필" className="profile-image" />
         <select value={location} onChange={(e) => setLocation(e.target.value)}>
           <option value="">근무지</option>
           <option value="대전">대전</option>
@@ -38,7 +34,7 @@ const ProfilePage = () => {
         </select>
       </div>
       <div className="mileage-box">
-        <h2>내 마일리지</h2>
+        <h2 style={{ color: "black", paddingBottom: "10px" }}>내 마일리지</h2>
         <div className="circle">
           <svg viewBox="0 0 100 100">
             <circle cx="50" cy="50" r="45" className="bg" />
@@ -49,7 +45,13 @@ const ProfilePage = () => {
               className="progress"
               style={{ strokeDashoffset: 282.6 - (282.6 * percent) / 100 }}
             />
-            <text x="50%" y="50%" dominantBaseline="middle" textAnchor="middle" className="mileage-text">
+            <text
+              x="50%"
+              y="50%"
+              dominantBaseline="middle"
+              textAnchor="middle"
+              className="mileage-text"
+            >
               {mileage}
             </text>
           </svg>

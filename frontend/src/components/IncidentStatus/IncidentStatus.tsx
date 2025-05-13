@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 
-import IncidentsList from "../IncidentsList";
+import IncidentsList from "../IncidentsList/IncidentsList";
 import api from "../../api";
 import { Factory } from "../../models/Factory";
 import { Incident } from "../../models/Incident";
@@ -65,6 +65,7 @@ const IncidentStatus = () => {
           (item: any) =>
             new Incident(
               item.id,
+              item.worker,
               item.threatType,
               item.threatLevel,
               item.workType,
@@ -107,7 +108,7 @@ const IncidentStatus = () => {
               등록되었습니다.
             </h1>
           )}
-          <div style={{ width: "20%" }}>
+          <div style={{ width: "25%", marginRight: "40px" }}>
             <select
               value={factory.id}
               onChange={handleFactoryChange}
