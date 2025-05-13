@@ -115,7 +115,15 @@ const Dashboard = () => {
         </div>
         <div className="dashboardCell">
           <h2 className="cardTitle">LLM 분석결과 요약 및 ESG 판단</h2>
-          <div className="card"></div>
+          <div className="card">
+            <img
+              src="/esg_report.png"
+              alt="esg_report"
+              style={{
+                width: "40%",
+              }}
+            />
+          </div>
         </div>
       </div>
     </div>

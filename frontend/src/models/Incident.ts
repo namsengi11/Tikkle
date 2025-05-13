@@ -1,8 +1,10 @@
 import { Factory } from "./Factory";
 import { Category } from "./Category";
+import { Worker } from "./Worker";
 
 export class Incident {
   id: number;
+  worker: Worker;
   threatType: Category;
   threatLevel: number;
   workType: Category;
@@ -14,6 +16,7 @@ export class Incident {
 
   constructor(
     id: number,
+    worker: Worker,
     threatType: Category,
     threatLevel: number,
     workType: Category,
@@ -24,6 +27,7 @@ export class Incident {
     additionalData: Record<string, any> = {}
   ) {
     this.id = id;
+    this.worker = worker;
     this.threatType = threatType;
     this.threatLevel = threatLevel;
     this.workType = workType;
@@ -36,6 +40,7 @@ export class Incident {
 
   getRelatedInfoInString() {
     const relatedInfo: [string, string][] = [
+      ["작업자", this.worker.name],
       ["위험요소 종류", this.threatType.name],
       ["위험요소 레벨", this.threatLevel.toString()],
       ["작업 종류", this.workType.name],
@@ -50,6 +55,7 @@ export class Incident {
   static fromJson(json: any) {
     const {
       id = 0,
+      worker = new Worker(0, "", new Category(0, ""), "", new Category(0, "")),
       threatType = new Category(0, ""),
       threatLevel = 0,
       workType = new Category(0, ""),
@@ -62,6 +68,7 @@ export class Incident {
 
     return new Incident(
       id,
+      worker,
       threatType,
       threatLevel,
       workType,

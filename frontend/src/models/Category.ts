@@ -6,4 +6,12 @@ export class Category {
     this.id = id;
     this.name = name;
   }
+
+  static createFromRange(object: any) {
+    return new Category(object.id ?? 0, object.range ?? "");
+  }
+
+  toString() {
+    return this.name;
+  }
 }
