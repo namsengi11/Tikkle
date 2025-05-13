@@ -6,6 +6,7 @@ import DropdownSelect from "../DropdownSelect/DropdownSelect";
 import TrueFalseToggle from "../TrueFalseToggle/TrueFalseToggle";
 
 import "./AddIncidentForm.css";
+import ImageUploader from "../ImageUploader/ImageUploader";
 
 const AddIncidentForm = ({
   onAdd,
@@ -354,6 +355,10 @@ const AddIncidentForm = ({
           placeholder="산재 발생 공장을 선택해주세요"
           required
         />
+        <label className="formLabel" htmlFor="image">
+          이미지 첨부
+        </label>
+        <ImageUploader />
       </div>
       <div className="formGroup">
         <h3
