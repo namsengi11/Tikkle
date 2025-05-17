@@ -28,6 +28,7 @@ chrome-user-data
 *.swo
 package-lock.json
 .secrets
+.env
 
 packages/react-devtools-core/dist
 packages/react-devtools-extensions/chrome/build
