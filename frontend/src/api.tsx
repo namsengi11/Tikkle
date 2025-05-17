@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://tikkle.sjnam.site/api",
+  baseURL: "https://tikkle.sjnam.site/api",
 });
 
 export default api;
