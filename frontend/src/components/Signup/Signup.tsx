@@ -73,6 +73,8 @@ const Signup: React.FC<SignupProps> = ({ onSignup }) => {
       }
 
       navigate("/"); // Redirect to dashboard after successful signup
+      // Rerender the page
+      window.location.reload();
     } catch (err: any) {
       if (err.response && err.response.data && err.response.data.detail) {
         setError(err.response.data.detail);
