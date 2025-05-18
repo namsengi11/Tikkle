@@ -21,6 +21,10 @@ jobs:
     runs-on: ubuntu-latest
     container:
       image: python:3.10-slim
+    env:
+      AUTH_KEY: ${{ secrets.AUTH_KEY }}
+      ALGORITHM: ${{ secrets.ALGORITHM }}
+      ACCESS_TOKEN_EXPIRE_MINUTES: ${{ secrets.ACCESS_TOKEN_EXPIRE_MINUTES }}
     steps:
       - uses: actions/checkout@v3
       - name: Install dependencies
