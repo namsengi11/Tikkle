@@ -2,7 +2,7 @@ from sqlalchemy import create_engine, Column, Integer, String, DateTime, Foreign
 from sqlalchemy.orm import sessionmaker, Session, declarative_base
 from sqlalchemy import event
 
-DATABASE_URL = "sqlite:///../user.db"
+DATABASE_URL = "sqlite:///../../user.db"
 
 engine = create_engine(
   DATABASE_URL,

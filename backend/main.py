@@ -1,10 +1,10 @@
 import uvicorn
-import json
 import logging
 import os
+import sys
+
 from datetime import datetime
 from pathlib import Path
-
 from fastapi import FastAPI, Request, HTTPException, status, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -13,12 +13,11 @@ from pydantic import BaseModel
 from sqlalchemy.orm import Session
 from typing import Annotated
 
-from auth import getCurrentUser
-from db import get_db
-from db import Incident, Factory, ThreatType, WorkType, CheckQuestion, CheckResponse, AgeRange, WorkExperienceRange, IndustryTypeLarge, IndustryTypeMedium, WorkforceSizeRange, Worker
-from model import IncidentBase, IncidentResponse, FactoryResponse, IncidentResponses, FactoryResponses, ThreatTypeResponse, ThreatTypeResponses, WorkTypeResponse, WorkTypeResponses, CheckQuestionResponse, CheckQuestionResponses, AgeRangeResponse, WorkExperienceRangeResponse, IndustryTypeLargeResponse, IndustryTypeMediumResponse, AgeRangeResponses, WorkExperienceRangeResponses, IndustryTypeLargeResponses, IndustryTypeMediumResponses, WorkforceSizeRangeResponse, WorkerResponse, WorkerResponses, WorkforceSizeRangeResponses, WorkerInput
-from logging_middleware import LoggingMiddleware
-from auth import router as auth_router
+from backend.auth.auth import getCurrentUser, router as auth_router
+from backend.db import get_db
+from backend.db import Incident, Factory, ThreatType, WorkType, CheckQuestion, CheckResponse, AgeRange, WorkExperienceRange, IndustryTypeLarge, IndustryTypeMedium, WorkforceSizeRange, Worker
+from backend.model import IncidentBase, IncidentResponse, FactoryResponse, IncidentResponses, FactoryResponses, ThreatTypeResponse, ThreatTypeResponses, WorkTypeResponse, WorkTypeResponses, CheckQuestionResponse, CheckQuestionResponses, AgeRangeResponse, WorkExperienceRangeResponse, IndustryTypeLargeResponse, IndustryTypeMediumResponse, AgeRangeResponses, WorkExperienceRangeResponses, IndustryTypeLargeResponses, IndustryTypeMediumResponses, WorkforceSizeRangeResponse, WorkerResponse, WorkerResponses, WorkforceSizeRangeResponses, WorkerInput
+from backend.logging_middleware import LoggingMiddleware
 
 app = FastAPI(root_path="/api")
 

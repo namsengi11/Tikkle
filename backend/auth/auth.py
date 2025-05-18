@@ -10,8 +10,8 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
-from auth_db import get_db, User
-from auth_model import CreateUser, Token
+from .auth_db import get_db, User
+from .auth_model import CreateUser, Token
 
 router = APIRouter(prefix="/auth")
 
@@ -45,7 +45,11 @@ def validateUsername(username: str, db: Session):
 
   # check username is unique
   existingUser = db.query(User).filter(User.username == username).first()
+  print(db.query(User).all())
+  print(username)
+  print(existingUser)
   if existingUser:
+    print("Username already exists")
     raise HTTPException(status_code=400, detail="Username already exists")
 
   return True
@@ -83,7 +87,7 @@ def createAccessToken(username: str):
   return jwt.encode(encode, str(os.getenv("AUTH_KEY")), algorithm=os.getenv("ALGORITHM"))
 
 @router.post("/token", response_model=Token)
-async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
+def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
   user = authenticateUser(form_data.username, form_data.password, db)
   if not user:
     raise HTTPException(status_code=401, detail="Invalid username or password")
@@ -93,7 +97,7 @@ async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, De
   return {"access_token": token, "token_type": "Bearer"}
 
 
-async def getCurrentUser(token: Annotated[str, Depends(oauth2_bearer)]):
+def getCurrentUser(token: Annotated[str, Depends(oauth2_bearer)]):
   try:
     payload = jwt.decode(token, str(os.getenv("AUTH_KEY")), algorithms=[os.getenv("ALGORITHM")])
     username: str = payload.get("sub")
