@@ -11,18 +11,23 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
-from typing import List
+from typing import Annotated
 
+from auth import getCurrentUser
 from db import get_db
 from db import Incident, Factory, ThreatType, WorkType, CheckQuestion, CheckResponse, AgeRange, WorkExperienceRange, IndustryTypeLarge, IndustryTypeMedium, WorkforceSizeRange, Worker
 from model import IncidentBase, IncidentResponse, FactoryResponse, IncidentResponses, FactoryResponses, ThreatTypeResponse, ThreatTypeResponses, WorkTypeResponse, WorkTypeResponses, CheckQuestionResponse, CheckQuestionResponses, AgeRangeResponse, WorkExperienceRangeResponse, IndustryTypeLargeResponse, IndustryTypeMediumResponse, AgeRangeResponses, WorkExperienceRangeResponses, IndustryTypeLargeResponses, IndustryTypeMediumResponses, WorkforceSizeRangeResponse, WorkerResponse, WorkerResponses, WorkforceSizeRangeResponses, WorkerInput
 from logging_middleware import LoggingMiddleware
+from auth import router as auth_router
 
 app = FastAPI(root_path="/api")
 
 logger = logging.getLogger("fastapi")
 # Add the middleware to the app
 app.add_middleware(LoggingMiddleware)
+
+# Include the auth router
+app.include_router(auth_router)
 
 # Only allow requests from the local host (proxied by nginx)
 origins = [
@@ -67,7 +72,10 @@ varNameToResponseModel = {
   "worker": WorkerResponse,
 }
 
-def convertDBModelintoResponseModel(dbModel, db: Session, additionalAttributes: dict = {}) -> BaseModel:
+db_dependency = Annotated[Session, Depends(get_db)]
+user_dependency = Annotated[dict, Depends(getCurrentUser)]
+
+def convertDBModelintoResponseModel(dbModel, db: Session = Depends(get_db), additionalAttributes: dict = {}) -> BaseModel:
   model = varNameToModel[dbModel.typeToString()]
   dbModelDict = dbModel.__dict__.copy()
   dbModelDict.pop("_sa_instance_state")
@@ -86,7 +94,7 @@ def convertDBModelintoResponseModel(dbModel, db: Session, additionalAttributes: 
   responseModel = varNameToResponseModel[dbModel.typeToString()]
   return responseModel.model_validate(modelDict)
 
-def convertIncidentToResponse(incident: Incident, db: Session) -> IncidentResponse:
+def convertIncidentToResponse(incident: Incident, db: Session = Depends(get_db)) -> IncidentResponse:
   # get check responses for response
   checkResponses = db.query(CheckResponse).filter(CheckResponse.incident_id == incident.id).all()
   checkResponsesDict = dict()
