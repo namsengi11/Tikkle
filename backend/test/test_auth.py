@@ -13,10 +13,10 @@ from jose import jwt
 # Add the project root directory to the Python path
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
-from backend.auth.auth_db import Base, User, get_db
-from backend.auth.auth_model import CreateUser, Token
-from backend.auth.auth import validateUsername, validatePassword, authenticateUser, createAccessToken, getCurrentUser, bcrypt_context
-from backend.main import app
+from auth.auth_db import Base, User, get_db
+from auth.auth_model import CreateUser, Token
+from auth.auth import validateUsername, validatePassword, authenticateUser, createAccessToken, getCurrentUser, bcrypt_context
+from main import app
 
 # Setup test database
 TEST_DATABASE_URL = "sqlite:///:memory:"
