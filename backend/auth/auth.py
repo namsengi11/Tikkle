@@ -45,11 +45,7 @@ def validateUsername(username: str, db: Session):
 
   # check username is unique
   existingUser = db.query(User).filter(User.username == username).first()
-  print(db.query(User).all())
-  print(username)
-  print(existingUser)
   if existingUser:
-    print("Username already exists")
     raise HTTPException(status_code=400, detail="Username already exists")
 
   return True
