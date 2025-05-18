@@ -324,3 +324,45 @@ def testAddIncidentInvalidFactory(testDb, createIncident):
   }
   response = client.post("/incidents", json=incidentData)
   assert response.status_code == 404
+
+def testServerStartup():
+  """Test that the server can be started and responds to basic requests"""
+  from main import app
+  with TestClient(app) as client:
+    response = client.get("/")
+    # The root path should return 404 since we don't have a root handler
+    # but the server should be running
+    assert response.status_code == 404
+
+    # Test a valid endpoint
+    response = client.get("/factories")
+    assert response.status_code == 200
+
+def testCORSHeaders():
+  """Test that CORS headers are properly set"""
+  from main import app
+  with TestClient(app) as client:
+    response = client.options("/factories", headers={
+      "Origin": "http://127.0.0.1:5173",
+      "Access-Control-Request-Method": "GET"
+    })
+    assert response.status_code == 200
+    assert "access-control-allow-origin" in response.headers
+    assert response.headers["access-control-allow-origin"] == "http://127.0.0.1:5173"
+    assert "access-control-allow-credentials" in response.headers
+    assert response.headers["access-control-allow-credentials"] == "true"
+
+def testRootPathConfiguration():
+  """Test that the root_path is properly configured"""
+  from main import app
+  assert app.root_path == "/api"
+
+  # The TestClient doesn't respect root_path, so we need to test this differently
+  # We can check that the OpenAPI schema has the correct servers
+  with TestClient(app) as client:
+    response = client.get("/openapi.json")
+    assert response.status_code == 200
+    schema = response.json()
+    assert "servers" in schema
+    assert len(schema["servers"]) > 0
+    assert schema["servers"][0]["url"] == "/api"
