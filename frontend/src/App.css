@@ -8,6 +8,7 @@
 :root {
   /* Primary colors */
   --primary-color: #24a1f9;
+  --primary-color-hover: #1e85c4;
 
   /* Secondary colors */
   --secondary-color: #0650e5;
@@ -53,12 +54,29 @@ body,
 
 .App-header {
   padding: 16px 24px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
 }
 
 .App-header h1 {
   margin: 0;
   font-size: 24px;
   color: var(--white);
+}
+
+.loginButton {
+  background-color: var(--primary-color);
+  color: var(--white);
+  border: 1px solid var(--primary-color);
+  border-radius: 4px;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.loginButton:hover {
+  background-color: var(--primary-color-hover);
 }
 
 main {
