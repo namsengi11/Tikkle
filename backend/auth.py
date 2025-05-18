@@ -22,8 +22,8 @@ load_dotenv()
 
 @router.post("/user", status_code=status.HTTP_201_CREATED)
 async def createUser(user: CreateUser, db: Session = Depends(get_db)):
-  validateUsername(user.username)
-  validatePassword(user.password)
+  validateUsername(user.username, db)
+  validatePassword(user.password, db)
 
   # hash password
   hashedPassword = bcrypt_context.hash(user.password)
@@ -36,7 +36,7 @@ async def createUser(user: CreateUser, db: Session = Depends(get_db)):
 
   return status.HTTP_201_CREATED
 
-def validateUsername(username: str, db: Session = Depends(get_db)):
+def validateUsername(username: str, db: Session):
   if len(username) < 5:
     raise HTTPException(status_code=400, detail="Username must be at least 5 characters long")
 
@@ -44,13 +44,13 @@ def validateUsername(username: str, db: Session = Depends(get_db)):
     raise HTTPException(status_code=400, detail="Username can only contain letters, numbers, and underscores")
 
   # check username is unique
-  existingUser = db.query(User).filter(username == username).first()
+  existingUser = db.query(User).filter(User.username == username).first()
   if existingUser:
     raise HTTPException(status_code=400, detail="Username already exists")
 
   return True
 
-def validatePassword(password: str):
+def validatePassword(password: str, db: Session):
    # Validate password strength
   if len(password) < 8:
     raise HTTPException(status_code=400, detail="Password must be at least 8 characters long")
