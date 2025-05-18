@@ -40,7 +40,7 @@ jobs:
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
           echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r ./backend/*.py ./backend/requirements.txt ./backend/resources ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/Tikkle/backend
+          scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r ./backend/*.py ./backend/requirements.txt ./backend/resources ./backend/auth ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:~/Tikkle/backend
       - name: Deploy frontend using SCP
         run: scp -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa -r ./frontend/dist/* ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }}:/var/www/tikkle
       - name: Restart backend
