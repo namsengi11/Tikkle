@@ -1,14 +1,18 @@
 import pytest
 import os
+import sys
 
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from datetime import datetime
 
-from main import app, convertIncidentToResponse, convertDBModelintoResponseModel
-from db import get_db, Factory, Incident, Base, ThreatType, WorkType, Worker, WorkforceSizeRange, AgeRange, WorkExperienceRange, IndustryTypeLarge, IndustryTypeMedium
-from model import IncidentBase, IncidentResponse, FactoryResponse
+# Add the project root directory to the Python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
+from backend.main import app, convertIncidentToResponse, convertDBModelintoResponseModel
+from backend.db import get_db, Factory, Incident, Base, ThreatType, WorkType, Worker, WorkforceSizeRange, AgeRange, WorkExperienceRange, IndustryTypeLarge, IndustryTypeMedium
+from backend.model import IncidentBase, IncidentResponse, FactoryResponse
 
 # Create test database
 @pytest.fixture(scope='session')

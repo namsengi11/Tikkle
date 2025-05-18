@@ -10,8 +10,8 @@ from jose import jwt, JWTError
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session
 
-from auth_db import get_db, User
-from auth_model import CreateUser, Token
+from .auth_db import get_db, User
+from .auth_model import CreateUser, Token
 
 router = APIRouter(prefix="/auth")
 
@@ -22,8 +22,8 @@ load_dotenv()
 
 @router.post("/user", status_code=status.HTTP_201_CREATED)
 async def createUser(user: CreateUser, db: Session = Depends(get_db)):
-  validateUsername(user.username)
-  validatePassword(user.password)
+  validateUsername(user.username, db)
+  validatePassword(user.password, db)
 
   # hash password
   hashedPassword = bcrypt_context.hash(user.password)
@@ -36,7 +36,7 @@ async def createUser(user: CreateUser, db: Session = Depends(get_db)):
 
   return status.HTTP_201_CREATED
 
-def validateUsername(username: str, db: Session = Depends(get_db)):
+def validateUsername(username: str, db: Session):
   if len(username) < 5:
     raise HTTPException(status_code=400, detail="Username must be at least 5 characters long")
 
@@ -44,13 +44,17 @@ def validateUsername(username: str, db: Session = Depends(get_db)):
     raise HTTPException(status_code=400, detail="Username can only contain letters, numbers, and underscores")
 
   # check username is unique
-  existingUser = db.query(User).filter(username == username).first()
+  existingUser = db.query(User).filter(User.username == username).first()
+  print(db.query(User).all())
+  print(username)
+  print(existingUser)
   if existingUser:
+    print("Username already exists")
     raise HTTPException(status_code=400, detail="Username already exists")
 
   return True
 
-def validatePassword(password: str):
+def validatePassword(password: str, db: Session):
    # Validate password strength
   if len(password) < 8:
     raise HTTPException(status_code=400, detail="Password must be at least 8 characters long")
@@ -83,7 +87,7 @@ def createAccessToken(username: str):
   return jwt.encode(encode, str(os.getenv("AUTH_KEY")), algorithm=os.getenv("ALGORITHM"))
 
 @router.post("/token", response_model=Token)
-async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
+def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
   user = authenticateUser(form_data.username, form_data.password, db)
   if not user:
     raise HTTPException(status_code=401, detail="Invalid username or password")
@@ -93,7 +97,7 @@ async def loginForAccessToken(form_data: Annotated[OAuth2PasswordRequestForm, De
   return {"access_token": token, "token_type": "Bearer"}
 
 
-async def getCurrentUser(token: Annotated[str, Depends(oauth2_bearer)]):
+def getCurrentUser(token: Annotated[str, Depends(oauth2_bearer)]):
   try:
     payload = jwt.decode(token, str(os.getenv("AUTH_KEY")), algorithms=[os.getenv("ALGORITHM")])
     username: str = payload.get("sub")
